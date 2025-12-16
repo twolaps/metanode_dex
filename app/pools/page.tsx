@@ -8,7 +8,7 @@ export default function PoolsPage() {
 		...poolManagerConfig,
 		functionName: "getAllPools",
 	});
-	
+
 	return (
 		<div>
 
