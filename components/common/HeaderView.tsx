@@ -12,19 +12,27 @@ export const HeaderView = () => {
 		if (value === "tab1") {
 			router.push("/");
 		} else if (value === "tab2") {
-			router.push("/test");
+			router.push("/pools");
 		}
 	}
 
-	return (
-		<div className="flex h-25 relative">
+	const tabTriggerClass: string = [
+		'cursor-pointer',
+		'text-[#99A1AF]',
+		'text-2xl',
+		'data-[state=active]:bg-[#2F2C38]',
+		'data-[state=active]:text-white',
+	].join(' ');
 
-			<div id="test1" className="absolute flex justify-center border w-full h-full items-center">
+	return (
+		<div className="flex h-25 relative bg-[#171422] text-white items-center">
+
+			<div id="test1" className="absolute flex justify-center w-full h-full items-center">
 				<Tabs defaultValue="tab1" onValueChange={onValueChange}>
-					<TabsList className="w-100 h-12 gap-5 p-1">
-						<TabsTrigger value="tab1" className="text-2xl">Swap</TabsTrigger>
-						<TabsTrigger value="tab2" className="text-2xl">Pools</TabsTrigger>
-						<TabsTrigger value="tab3" className="text-2xl">Position</TabsTrigger>
+					<TabsList className="w-100 h-12 gap-5 p-1 bg-transparent">
+						<TabsTrigger value="tab1" className={tabTriggerClass}>Swap</TabsTrigger>
+						<TabsTrigger value="tab2" className={tabTriggerClass}>Pools</TabsTrigger>
+						<TabsTrigger value="tab3" className={tabTriggerClass}>Position</TabsTrigger>
 					</TabsList>
 				</Tabs>
 			</div>

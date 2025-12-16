@@ -11,7 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return(
 		<ClientLayout>
 			<HeaderView/>
-			<Separator />
+			<Separator className="h-2 w-full" style={{ backgroundColor: "rgba(120, 120, 180, 0.3)" }} />
 			{children}
 		</ClientLayout>
 	)
