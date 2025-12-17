@@ -17,6 +17,9 @@ module.exports = {
           'Arial',
           'sans-serif',
         ],
+				color:{
+					bg: 'var(--background)',
+				}
       },
     },
   },
