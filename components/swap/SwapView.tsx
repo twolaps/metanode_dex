@@ -36,6 +36,7 @@ export default function SwapView() {
 		'border-[#2F2C38]',
 		'mt-2',
 		'flex-col',
+		'relative',
 	].join(' ');
 
 	return (
