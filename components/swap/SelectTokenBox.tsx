@@ -2,10 +2,13 @@ import { ChevronsUpDown } from "lucide-react";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Command, CommandEmpty, CommandGroup } from "../ui/command";
-import { useEffect } from "react";
-import { getSwapTokenMap } from "@/app/tools/swapMath";
+import { TokenInfo } from "@/app/tools/types";
 
-export const SelectTokenBox = () => {
+interface SelectTokenBoxProps {
+	selectableTokensMap: Map<string, TokenInfo>;
+}
+
+export const SelectTokenBox = ({ selectableTokensMap }: SelectTokenBoxProps) => {
 	const btnClass: string = [
 		'mt-4',
 		'w-[120px]',

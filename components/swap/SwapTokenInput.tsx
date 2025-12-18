@@ -1,13 +1,15 @@
 import { Input } from "@/components/ui/input"
 import { SelectTokenBox } from "./SelectTokenBox";
+import { TokenInfo } from "@/app/tools/types";
 
 interface SwapTokenInputProps {
 	fromOrTo: 'from' | 'to';
 	mt: number;
 	mb: number;
+	selectableTokensMap: Map<string, TokenInfo>;
 }
 
-export const SwapTokenInput = ({ fromOrTo, mt, mb }: SwapTokenInputProps) => {<Input type="text" placeholder="Enter text..." />
+export const SwapTokenInput = ({ fromOrTo, mt, mb, selectableTokensMap }: SwapTokenInputProps) => {<Input type="text" placeholder="Enter text..." />
 
 	const inputClass: string = [
 		'w-[478px]',
@@ -29,7 +31,7 @@ export const SwapTokenInput = ({ fromOrTo, mt, mb }: SwapTokenInputProps) => {<I
 			<h1 className="text-[#99A1AF] text-base mr-auto ml-5 mb-2">{fromOrTo === 'from' ? '从' : '到'}</h1>
 			<div className="flex relative">
 				<Input type="number" placeholder="0.0000" className={inputClass} />
-				<SelectTokenBox />
+				<SelectTokenBox selectableTokensMap={selectableTokensMap} />
 			</div>
 		</div>
 	);

@@ -1,8 +1,14 @@
+import { useEffect, useState } from "react";
 import { SwapButton } from "./SwapButton";
 import { SwapTokenInput } from "./SwapTokenInput";
 import { SwitchTokenButton } from "./SwitchTokenButton";
+import { TokenInfo } from "@/app/tools/types";
+import { getSwapTokenMap } from "@/app/tools/swapMath";
 
 export default function SwapView() {
+
+	const [selectableTokensMap, setSelectableTokensMap] = 
+	useState<Map<string, TokenInfo>>(new Map<string, TokenInfo>());
 
 	const titleClass: string = [
 		'w-fit',
@@ -39,6 +45,15 @@ export default function SwapView() {
 		'relative',
 	].join(' ');
 
+	useEffect(() => {
+		const fetchSelectableTokens = async () => {
+			const map: Map<string, TokenInfo> = await getSwapTokenMap();
+			setSelectableTokensMap(map);
+		};
+
+		fetchSelectableTokens();
+	}, []);
+
 	return (
 		<div className="
 			w-[550px]
@@ -53,9 +68,9 @@ export default function SwapView() {
 			</h3>
 
 			<div className={radiusRectClass}>
-				<SwapTokenInput fromOrTo="from" mt={6} mb={4} />
+				<SwapTokenInput fromOrTo="from" mt={6} mb={4} selectableTokensMap={selectableTokensMap}/>
 				<SwitchTokenButton />
-				<SwapTokenInput fromOrTo="to" mt={0} mb={0} />
+				<SwapTokenInput fromOrTo="to" mt={0} mb={0} selectableTokensMap={selectableTokensMap} />
 				<SwapButton />
 			</div>
 			
