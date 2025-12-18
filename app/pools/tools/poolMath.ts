@@ -1,38 +1,25 @@
+import { FormattedPoolInfo, RawPoolInfo, TokenInfo } from "@/app/tools/types";
 import { client } from "@/config/client";
-import { Address, erc20Abi, isAddress } from "viem";
+import { poolManagerConfig } from "@/config/contracts";
+import { Address, erc20Abi, isAddress, stringify } from "viem";
 
-export interface RawPoolInfo {
-  pool: Address;         
-  token0: Address;       
-  token1: Address;       
-  index: number;         
-  fee: number;           
-  feeProtocol: number;   
-  tickLower: number;     
-  tickUpper: number;     
-  tick: number;          
-  sqrtPriceX96: bigint;  
-  liquidity: bigint;     
-}
+export async function formatPoolInfos(): Promise<FormattedPoolInfo[]> {
 
-export interface FormattedPoolInfo {
-  pool: Address;         
-  token0: string;        
-  token1: string;
-	decimals0: number;
-	decimals1: number;
-	fee: string;
-	range: string;
-	price: string;
-	liquidity: string;
-}
+	let rawPools: RawPoolInfo[] = [];
+	try {
+		const result = await client.readContract({
+			...poolManagerConfig,
+			functionName: "getAllPools",
+		});
+		rawPools = result as RawPoolInfo[];
 
-export interface TokenInfo {
-	symbol: string;
-	decimals: number;
-}
+		console.log("poolData:", stringify(rawPools));
+	}
+	catch (error) {
+		console.error("Error fetching pools:", error);
+	}
+	
 
-export async function formatPoolInfos(rawPools: RawPoolInfo[]): Promise<FormattedPoolInfo[]> {
 	// 1. 边界检查
 	if(!rawPools || rawPools.length === 0) {
 		return [];
@@ -47,11 +34,11 @@ export async function formatPoolInfos(rawPools: RawPoolInfo[]): Promise<Formatte
 
 		// 只有合法的地址才放入 Map 准备查询
 		if (!tokenMap.has(token0Address) && isAddress(token0Address)) {
-			tokenMap.set(token0Address, {symbol: "UNKNOWN", decimals: 18});
+			tokenMap.set(token0Address, {address: token0Address, symbol: "UNKNOWN", decimals: 18});
 		}
 
 		if (!tokenMap.has(token1Address) && isAddress(token1Address)) {
-			tokenMap.set(token1Address, {symbol: "UNKNOWN", decimals: 18});
+			tokenMap.set(token1Address, {address: token1Address, symbol: "UNKNOWN", decimals: 18});
 		}
 	});
 

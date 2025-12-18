@@ -1,33 +1,21 @@
 'use client'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { poolManagerConfig } from "@/config/contracts";
-import { useReadContract } from "wagmi";
-import { formatPoolInfos, FormattedPoolInfo, RawPoolInfo } from "./tools/poolMath";
+import { formatPoolInfos } from "./tools/poolMath";
 import { JSX, useEffect, useState } from "react";
-import { stringify } from "viem";
+import { FormattedPoolInfo } from "../tools/types";
 
 export default function PoolsPage() {
 	const [formattedPoolInfos, setFormattedPoolInfos] = useState<FormattedPoolInfo[]>([]);
 
-	const {data: poolData} = useReadContract({
-		...poolManagerConfig,
-		functionName: "getAllPools",
-	});
-
-	console.log();
-	console.log("poolData:", stringify(poolData));
-
 	useEffect(() => {
 		const fetchAndFormatPools = async () => {
-			const formattedPoolInfos = await formatPoolInfos(poolData as RawPoolInfo[]);
+			const formattedPoolInfos = await formatPoolInfos();
 			setFormattedPoolInfos(formattedPoolInfos);
 		}
 
-		if (poolData){
-			fetchAndFormatPools();
-		};
+		fetchAndFormatPools();
 		
-	}, [poolData]);
+	}, []);
 	
 	const tableCells: JSX.Element[] = formattedPoolInfos.map((poolInfo) => {
 		const tableCell: JSX.Element = (
