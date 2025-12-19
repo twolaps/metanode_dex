@@ -31,3 +31,8 @@ export interface TokenInfo {
 	symbol: string;
 	decimals: number;
 }
+
+export interface PairInfo {
+	token0: Address;
+	token1: Address;
+}

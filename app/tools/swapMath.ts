@@ -1,10 +1,9 @@
 import { client } from "@/config/client";
 import { poolManagerConfig } from "@/config/contracts";
-import { RawPoolInfo, TokenInfo } from "./types";
-import { Address, erc20Abi, isAddress, stringify } from "viem";
+import { PairInfo, RawPoolInfo, TokenInfo } from "./types";
+import { Address, erc20Abi, isAddress } from "viem";
 
 export async function getSwapTokenMap(): Promise<Map<Address, TokenInfo>> {
-
 	let rawPools: RawPoolInfo[] = [];
 	try {
 		const result = await client.readContract({
@@ -13,7 +12,7 @@ export async function getSwapTokenMap(): Promise<Map<Address, TokenInfo>> {
 		});
 		rawPools = result as RawPoolInfo[];
 
-		console.log("poolData:", stringify(rawPools));
+		console.log("poolData:", result.length);
 	}
 	catch (error) {
 		console.error("Error fetching pools:", error);
@@ -78,4 +77,24 @@ export async function getSwapTokenMap(): Promise<Map<Address, TokenInfo>> {
 	}
 
 	return tokenMap;
+}
+
+export async function getPairs(): Promise<PairInfo[]> {
+
+	let pairInfos: PairInfo[] = [];
+	try {
+		pairInfos = await client.readContract({
+			...poolManagerConfig,
+			functionName: "getPairs",
+		}) as PairInfo[];
+	}
+	catch (error) {
+		console.error("Error fetching pairs:", error);
+	}
+
+	return pairInfos;
+}
+
+export function checkPairsAvailability(fromToken: TokenInfo | null, toToken: TokenInfo | null) {
+		
 }

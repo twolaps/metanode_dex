@@ -1,14 +1,21 @@
 import { ChevronsUpDown } from "lucide-react";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
-import { Command, CommandEmpty, CommandGroup } from "../ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandItem } from "../ui/command";
 import { TokenInfo } from "@/app/tools/types";
+import { Address } from "viem";
+import { JSX, useState } from "react";
 
 interface SelectTokenBoxProps {
-	selectableTokensMap: Map<string, TokenInfo>;
+	selectableTokensMap: Map<Address, TokenInfo>;
+	onTokenSelect?: (token: TokenInfo) => void;
+	selectedToken?: TokenInfo | null;
+	setToken?: (token: TokenInfo | null) => void;
 }
 
-export const SelectTokenBox = ({ selectableTokensMap }: SelectTokenBoxProps) => {
+export const SelectTokenBox = ({ selectableTokensMap, onTokenSelect, selectedToken, setToken }: SelectTokenBoxProps) => {
+	const [open, setOpen] = useState(false);
+
 	const btnClass: string = [
 		'mt-4',
 		'w-[120px]',
@@ -21,11 +28,46 @@ export const SelectTokenBox = ({ selectableTokensMap }: SelectTokenBoxProps) => 
 		'right-2',
 	].join(' ');
 
+	const tokensArray: TokenInfo[] = Array.from(selectableTokensMap.values());
+
+	const onSelect = (token: TokenInfo) => {
+		if (onTokenSelect) {
+			onTokenSelect(token);
+		}
+
+		if (setToken) {
+			setToken(token);
+		}
+		
+		setOpen(false);
+	}
+
+
+	const commandItems: JSX.Element[] = [];
+
+	tokensArray.forEach((token) => {
+
+		if (token.symbol === "UNKNOWN") {
+			return;
+		}
+		
+		const commandItem: JSX.Element = (
+			<CommandItem 
+				key={token.address}
+				onSelect={() => onSelect(token)}>
+				{token.symbol}
+			</CommandItem>);
+
+		commandItems.push(commandItem);
+	});
+
+	const selectTokenSymbol: string = selectedToken ? selectedToken.symbol : "选择代币";
+		
 	return (
-		<Popover open={true}>
+		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
 				<Button className={btnClass}>
-					选择代币
+					{selectTokenSymbol}
 					<ChevronsUpDown />
 				</Button>
 			</PopoverTrigger>
@@ -37,6 +79,7 @@ export const SelectTokenBox = ({ selectableTokensMap }: SelectTokenBoxProps) => 
 					</CommandEmpty>
 
 					<CommandGroup>
+						{commandItems}
 					</CommandGroup>
 				</Command>
 			</PopoverContent>

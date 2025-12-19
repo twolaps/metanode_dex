@@ -29,6 +29,8 @@ export default function PoolsPage() {
 			return tableCell;
 	});
 
+	console.log(tableCells.length)
+
 	return (
 		<div className="w-[1200px] max-h-[1000px] overflow-y-auto m-auto">
 			<Table className="w-[1150px] m-auto mt-10">

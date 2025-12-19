@@ -2,13 +2,18 @@ import { useEffect, useState } from "react";
 import { SwapButton } from "./SwapButton";
 import { SwapTokenInput } from "./SwapTokenInput";
 import { SwitchTokenButton } from "./SwitchTokenButton";
-import { TokenInfo } from "@/app/tools/types";
-import { getSwapTokenMap } from "@/app/tools/swapMath";
+import { PairInfo, TokenInfo } from "@/app/tools/types";
+import { getPairs, getSwapTokenMap } from "@/app/tools/swapMath";
+import { Address } from "viem";
 
 export default function SwapView() {
 
 	const [selectableTokensMap, setSelectableTokensMap] = 
-	useState<Map<string, TokenInfo>>(new Map<string, TokenInfo>());
+	useState<Map<Address, TokenInfo>>(new Map<Address, TokenInfo>());
+
+	const [fromToken, setFromToken] = useState<TokenInfo | null>(null);
+	const [toToken, setToToken] = useState<TokenInfo | null>(null);
+	const [pairs, setPairs] = useState<PairInfo[]>([]);
 
 	const titleClass: string = [
 		'w-fit',
@@ -31,7 +36,7 @@ export default function SwapView() {
 
 	const radiusRectClass: string = [
 		'w-[545px]',
-		'h-[400px]',
+		'h-[430px]',
 		'bg-[#1E1B27]',
 		'rounded-[16px]',
 		'flex',
@@ -47,12 +52,37 @@ export default function SwapView() {
 
 	useEffect(() => {
 		const fetchSelectableTokens = async () => {
-			const map: Map<string, TokenInfo> = await getSwapTokenMap();
+			const map: Map<Address, TokenInfo> = await getSwapTokenMap();
 			setSelectableTokensMap(map);
 		};
 
+		const fetchPairs = async () => {
+			const pairs: PairInfo[] = await getPairs();
+			console.log("Fetched pairs:", pairs);
+			setPairs(pairs);
+		};
+
 		fetchSelectableTokens();
+		fetchPairs();
 	}, []);
+
+	let pairsAvailable: boolean = false;
+	if (!pairs || pairs.length === 0) {
+		pairsAvailable = false;
+	}
+	else {
+		pairsAvailable = pairs.some((pairInfo: PairInfo) => {
+			if (fromToken?.address === pairInfo.token0 && toToken?.address === pairInfo.token1) {
+				return true;
+			}
+			else if (fromToken?.address === pairInfo.token1 && toToken?.address === pairInfo.token0) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		});	
+	}
 
 	return (
 		<div className="
@@ -68,12 +98,12 @@ export default function SwapView() {
 			</h3>
 
 			<div className={radiusRectClass}>
-				<SwapTokenInput fromOrTo="from" mt={6} mb={4} selectableTokensMap={selectableTokensMap}/>
+				<SwapTokenInput fromOrTo="from" mt={6} mb={4} selectableTokensMap={selectableTokensMap} selectedToken={fromToken} setToken={setFromToken} />
 				<SwitchTokenButton />
-				<SwapTokenInput fromOrTo="to" mt={0} mb={0} selectableTokensMap={selectableTokensMap} />
+				<SwapTokenInput fromOrTo="to" mt={0} mb={0} selectableTokensMap={selectableTokensMap} selectedToken={toToken} setToken={setToToken} />
 				<SwapButton />
+				<h1 className={`text-red-400 mt-3 ${pairsAvailable || !fromToken || !toToken ? 'hidden' : ''}`}>流动性不足</h1>
 			</div>
-			
 		</div>
 	);
 }
