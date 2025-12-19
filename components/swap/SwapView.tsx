@@ -4,7 +4,7 @@ import { SwapTokenInput } from "./SwapTokenInput";
 import { SwitchTokenButton } from "./SwitchTokenButton";
 import { PairInfo, RawPoolInfo, TokenInfo } from "@/app/tools/types";
 import { getPairs, getPools, getQuote, getSwapTokenMap } from "@/app/tools/swapMath";
-import { Address, isAddress } from "viem";
+import { Address, formatUnits } from "viem";
 
 export default function SwapView() {
 
@@ -18,6 +18,9 @@ export default function SwapView() {
 	const [pairs, setPairs] = useState<PairInfo[]>([]);
 
 	const [amountIn, setAmountIn] = useState<string>("");
+	const [amountOut, setAmountOut] = useState<string>("");
+
+	const [poolIndex, setPoolIndex] = useState<number | null>(null);
 
 	const titleClass: string = [
 		'w-fit',
@@ -74,9 +77,20 @@ export default function SwapView() {
 		});	
 	}
 
-	const checkAndGetQuote = async () => {
+	const checkAndGetQuote = async (pools: RawPoolInfo[]) => {
 		if (fromToken?.address && toToken?.address) {
-			await getQuote(fromToken, toToken, amountIn);
+			const result: {amountOut: bigint, poolIndex: number} = await getQuote(fromToken, toToken, amountIn, pools);
+
+			if (result.amountOut !== null) {
+				const amountOutFormatted: string = Number(formatUnits(result.amountOut, toToken.decimals)).toFixed(6);
+				setAmountOut(amountOutFormatted);
+			}
+			
+			if (result.poolIndex >= 0){
+				setPoolIndex(result.poolIndex);
+			}
+			
+			console.log("Estimated amount out:", result.amountOut.toString(), "from pool index:", result.poolIndex);
 		}
 	}
 
@@ -90,7 +104,7 @@ export default function SwapView() {
 
 	useEffect(() => {
 		const timerId = setTimeout(() => {
-			checkAndGetQuote();
+			checkAndGetQuote(allPools);
 		}, 500); // 500ms debounce
 		
 		return () => clearTimeout(timerId);
@@ -138,6 +152,7 @@ export default function SwapView() {
 					selectedToken={fromToken}
 					setToken={setFromToken}
 					onAmountChange={onAmountInChange}
+					amount={amountIn}
 				/>
 				<SwitchTokenButton />
 				<SwapTokenInput
@@ -148,6 +163,7 @@ export default function SwapView() {
 					selectedToken={toToken}
 					setToken={setToToken}
 					onAmountChange={onAmountOutChange}
+					amount={amountOut}
 				/>
 				<SwapButton />
 				<h1 className={`text-red-400 mt-3 ${pairsAvailable || !fromToken || !toToken ? 'hidden' : ''}`}>流动性不足</h1>

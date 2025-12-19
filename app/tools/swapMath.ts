@@ -21,7 +21,10 @@ export async function getPools(): Promise<RawPoolInfo[]> {
 	return rawPools;
 }
 
-export async function getSwapTokenMap(rawPools: RawPoolInfo[]): Promise<Map<Address, TokenInfo>> {
+
+
+export async function getSwapTokenMap(
+	rawPools: RawPoolInfo[]): Promise<Map<Address, TokenInfo>> {
 
 	const tokenMap: Map<Address, TokenInfo> = new Map<Address, TokenInfo>();
 
@@ -84,6 +87,9 @@ export async function getSwapTokenMap(rawPools: RawPoolInfo[]): Promise<Map<Addr
 	return tokenMap;
 }
 
+
+
+
 export async function getPairs(): Promise<PairInfo[]> {
 
 	let pairInfos: PairInfo[] = [];
@@ -100,32 +106,79 @@ export async function getPairs(): Promise<PairInfo[]> {
 	return pairInfos;
 }
 
+
+
+
+
 export async function getQuote(
 	fromToken: TokenInfo, 
 	toToken: TokenInfo,
-	amountIn: string): Promise<string> {
-		if (!amountIn || Number(amountIn) <= 0) return "0.0000";
+	amountIn: string,
+	pools: RawPoolInfo[]
+): Promise<{amountOut: bigint, poolIndex: number}> {
 
-		const amountInBigint: bigint = parseUnits(amountIn, fromToken.decimals);
+	console.log("Getting quote for:", {fromToken, toToken, amountIn});
 
-		const isLower: boolean = fromToken.address.toLowerCase() < toToken.address.toLowerCase();
+	if (!amountIn || Number(amountIn) <= 0) return {amountOut: 0n, poolIndex: -1};
 
-		const limit: bigint = isLower ? MIN_SQRT_PRICE + 1n : MAX_SQRT_PRICE - 1n;
+	const amountInBigint: bigint = parseUnits(amountIn, fromToken.decimals);
 
-		const { result: amountOut } = await client.simulateContract({
-			...swapConfig,
-			functionName: "quoteExactInput",
-			args: [
-				{
-					tokenIn: fromToken.address,
-					tokenOut: toToken.address,
-					indexPath: [0], // 默认路径索引数组
-					amountIn: amountInBigint,
-					sqrtPriceLimitX96: limit
-				}
-			],
-		});
+	const isLower: boolean = fromToken.address.toLowerCase() < toToken.address.toLowerCase();
 
-		console.log("Quoted amountOut:", amountOut);
-		return amountOut.toString();
+	const limit: bigint = isLower ? MIN_SQRT_PRICE + 1n : MAX_SQRT_PRICE - 1n;
+
+	const candidatePools: RawPoolInfo[] = pools.filter((pool: RawPoolInfo) => {
+		return ((pool.token0 === fromToken.address && pool.token1 === toToken.address) ||
+					(pool.token0 === toToken.address && pool.token1 === fromToken.address)) && 
+					pool.liquidity > 0n;
+	});
+
+	if (candidatePools.length === 0) {
+		console.warn("No available pools for the given token pair.");
+		return {amountOut: 0n, poolIndex: -1};
 	}
+
+	console.log(candidatePools);
+
+	const quotePromises = candidatePools.map(async (pool: RawPoolInfo) => {
+		try {
+			console.log(amountInBigint);
+			const {result} = await client.simulateContract({
+				...swapConfig,
+				functionName: "quoteExactInput",
+				args: [
+					{
+						tokenIn: fromToken.address,
+						tokenOut: toToken.address,
+						indexPath: [pool.index], // 默认路径索引数组
+						amountIn: amountInBigint,
+						sqrtPriceLimitX96: limit
+					}
+				],
+			});
+			console.log(`Quote from pool ${pool.index}:`, result);
+			return {amountOut: result as bigint, poolIndex: pool.index};
+		}
+		catch (error) {
+			console.error(`Error quoting on pool ${pool.index}:`, error);
+			return {amountOut: 0n, poolIndex: pool.index};
+		}
+	});
+
+	const quotes = await Promise.all(quotePromises);
+
+	// 找到最大的 amountOut
+	let maxAmountOut: bigint = 0n;
+	let maxIndex: number = -1;
+	quotes.forEach(({amountOut, poolIndex}) => {
+		if (amountOut > maxAmountOut) {
+			maxAmountOut = amountOut;
+			maxIndex = poolIndex;
+		}
+	});
+
+	if (maxAmountOut === 0n) {
+		return {amountOut: 0n, poolIndex: -1};
+	}
+	return {amountOut: maxAmountOut, poolIndex: maxIndex};
+}
