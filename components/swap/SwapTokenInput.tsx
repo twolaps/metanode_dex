@@ -12,7 +12,7 @@ interface SwapTokenInputProps {
 	setToken: (token: TokenInfo | null) => void;
 }
 
-export const SwapTokenInput = ({ fromOrTo, mt, mb, selectableTokensMap, selectedToken, setToken }: SwapTokenInputProps) => {<Input type="text" placeholder="Enter text..." />
+export const SwapTokenInput = ({ fromOrTo, mt, mb, selectableTokensMap, selectedToken, setToken }: SwapTokenInputProps) => {
 
 	let canInput: boolean = false;
 	if (selectedToken) {
