@@ -3,7 +3,7 @@ import { poolManagerConfig, swapConfig } from "@/config/contracts";
 import { MAX_SQRT_PRICE, MIN_SQRT_PRICE, PairInfo, RawPoolInfo, TokenInfo } from "./types";
 import { Address, erc20Abi, isAddress, parseUnits } from "viem";
 
-export async function getSwapTokenMap(): Promise<Map<Address, TokenInfo>> {
+export async function getPools(): Promise<RawPoolInfo[]> {
 	let rawPools: RawPoolInfo[] = [];
 	try {
 		const result = await client.readContract({
@@ -17,6 +17,11 @@ export async function getSwapTokenMap(): Promise<Map<Address, TokenInfo>> {
 	catch (error) {
 		console.error("Error fetching pools:", error);
 	}
+
+	return rawPools;
+}
+
+export async function getSwapTokenMap(rawPools: RawPoolInfo[]): Promise<Map<Address, TokenInfo>> {
 
 	const tokenMap: Map<Address, TokenInfo> = new Map<Address, TokenInfo>();
 
@@ -105,9 +110,9 @@ export async function getQuote(
 
 		const isLower: boolean = fromToken.address.toLowerCase() < toToken.address.toLowerCase();
 
-		const limit: bigint = isLower ? MIN_SQRT_PRICE : MAX_SQRT_PRICE;
+		const limit: bigint = isLower ? MIN_SQRT_PRICE + 1n : MAX_SQRT_PRICE - 1n;
 
-		const amountOut = await client.readContract({
+		const { result: amountOut } = await client.simulateContract({
 			...swapConfig,
 			functionName: "quoteExactInput",
 			args: [

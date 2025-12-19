@@ -2,18 +2,22 @@ import { useEffect, useState } from "react";
 import { SwapButton } from "./SwapButton";
 import { SwapTokenInput } from "./SwapTokenInput";
 import { SwitchTokenButton } from "./SwitchTokenButton";
-import { PairInfo, TokenInfo } from "@/app/tools/types";
-import { getPairs, getSwapTokenMap } from "@/app/tools/swapMath";
-import { Address } from "viem";
+import { PairInfo, RawPoolInfo, TokenInfo } from "@/app/tools/types";
+import { getPairs, getPools, getQuote, getSwapTokenMap } from "@/app/tools/swapMath";
+import { Address, isAddress } from "viem";
 
 export default function SwapView() {
 
 	const [selectableTokensMap, setSelectableTokensMap] = 
 	useState<Map<Address, TokenInfo>>(new Map<Address, TokenInfo>());
 
+	const [allPools, setAllPools] = useState<RawPoolInfo[]>([]);
+
 	const [fromToken, setFromToken] = useState<TokenInfo | null>(null);
 	const [toToken, setToToken] = useState<TokenInfo | null>(null);
 	const [pairs, setPairs] = useState<PairInfo[]>([]);
+
+	const [amountIn, setAmountIn] = useState<string>("");
 
 	const titleClass: string = [
 		'w-fit',
@@ -50,21 +54,7 @@ export default function SwapView() {
 		'relative',
 	].join(' ');
 
-	useEffect(() => {
-		const fetchSelectableTokens = async () => {
-			const map: Map<Address, TokenInfo> = await getSwapTokenMap();
-			setSelectableTokensMap(map);
-		};
-
-		const fetchPairs = async () => {
-			const pairs: PairInfo[] = await getPairs();
-			console.log("Fetched pairs:", pairs);
-			setPairs(pairs);
-		};
-
-		fetchSelectableTokens();
-		fetchPairs();
-	}, []);
+	
 
 	let pairsAvailable: boolean = false;
 	if (!pairs || pairs.length === 0) {
@@ -84,6 +74,48 @@ export default function SwapView() {
 		});	
 	}
 
+	const checkAndGetQuote = async () => {
+		if (fromToken?.address && toToken?.address) {
+			await getQuote(fromToken, toToken, amountIn);
+		}
+	}
+
+	const onAmountInChange = (value: string) => {
+		console.log("Amount In changed:", value);
+		setAmountIn(value);
+	}
+
+	const onAmountOutChange = async (amountOut: string) => {
+	}
+
+	useEffect(() => {
+		const timerId = setTimeout(() => {
+			checkAndGetQuote();
+		}, 500); // 500ms debounce
+		
+		return () => clearTimeout(timerId);
+		//eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [amountIn]);
+
+
+	useEffect(() => {
+		const fetchSelectableTokens = async () => {
+			const pools: RawPoolInfo[] = await getPools();
+			setAllPools(pools);
+			const map: Map<Address, TokenInfo> = await getSwapTokenMap(pools);
+			setSelectableTokensMap(map);
+		};
+
+		const fetchPairs = async () => {
+			const pairs: PairInfo[] = await getPairs();
+			console.log("Fetched pairs:", pairs);
+			setPairs(pairs);
+		};
+
+		fetchSelectableTokens();
+		fetchPairs();
+	}, []);
+
 	return (
 		<div className="
 			w-[550px]
@@ -98,9 +130,25 @@ export default function SwapView() {
 			</h3>
 
 			<div className={radiusRectClass}>
-				<SwapTokenInput fromOrTo="from" mt={6} mb={4} selectableTokensMap={selectableTokensMap} selectedToken={fromToken} setToken={setFromToken} />
+				<SwapTokenInput
+					fromOrTo="from"
+					mt={6}
+					mb={4}
+					selectableTokensMap={selectableTokensMap}
+					selectedToken={fromToken}
+					setToken={setFromToken}
+					onAmountChange={onAmountInChange}
+				/>
 				<SwitchTokenButton />
-				<SwapTokenInput fromOrTo="to" mt={0} mb={0} selectableTokensMap={selectableTokensMap} selectedToken={toToken} setToken={setToToken} />
+				<SwapTokenInput
+					fromOrTo="to"
+					mt={0}
+					mb={0}
+					selectableTokensMap={selectableTokensMap}
+					selectedToken={toToken}
+					setToken={setToToken}
+					onAmountChange={onAmountOutChange}
+				/>
 				<SwapButton />
 				<h1 className={`text-red-400 mt-3 ${pairsAvailable || !fromToken || !toToken ? 'hidden' : ''}`}>流动性不足</h1>
 			</div>
