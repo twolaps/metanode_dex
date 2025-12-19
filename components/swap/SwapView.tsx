@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import { SwapButton } from "./SwapButton";
 import { SwapTokenInput } from "./SwapTokenInput";
 import { SwitchTokenButton } from "./SwitchTokenButton";
-import { PairInfo, RawPoolInfo, TokenInfo } from "@/app/tools/types";
-import { getPairs, getPools, getQuote, getSwapTokenMap } from "@/app/tools/swapMath";
-import { Address, formatUnits } from "viem";
+import { PairInfo, RawPoolInfo, TokenInfo, TradeDirection } from "@/app/tools/types";
+import { getPairs, getPools, getOutQuote, getSwapTokenMap, getInQuote } from "@/app/tools/swapMath";
+import { Address, formatUnits, maxUint256 } from "viem";
 
 export default function SwapView() {
 
-	const [selectableTokensMap, setSelectableTokensMap] = 
-	useState<Map<Address, TokenInfo>>(new Map<Address, TokenInfo>());
+	const [selectableTokensMap, setSelectableTokensMap] = useState<Map<Address, TokenInfo>>(new Map<Address, TokenInfo>());
 
 	const [allPools, setAllPools] = useState<RawPoolInfo[]>([]);
 
@@ -21,6 +20,8 @@ export default function SwapView() {
 	const [amountOut, setAmountOut] = useState<string>("");
 
 	const [poolIndex, setPoolIndex] = useState<number | null>(null);
+
+	const [tradeDirection, setTradeDirection] = useState<TradeDirection>(TradeDirection.TO);
 
 	const titleClass: string = [
 		'w-fit',
@@ -77,9 +78,9 @@ export default function SwapView() {
 		});	
 	}
 
-	const checkAndGetQuote = async (pools: RawPoolInfo[]) => {
+	const checkAndGetOutQuote = async (pools: RawPoolInfo[]) => {
 		if (fromToken?.address && toToken?.address) {
-			const result: {amountOut: bigint, poolIndex: number} = await getQuote(fromToken, toToken, amountIn, pools);
+			const result: {amountOut: bigint, poolIndex: number} = await getOutQuote(fromToken, toToken, amountIn, pools);
 
 			if (result.amountOut !== null) {
 				const amountOutFormatted: string = Number(formatUnits(result.amountOut, toToken.decimals)).toFixed(6);
@@ -94,22 +95,57 @@ export default function SwapView() {
 		}
 	}
 
+	const checkAndGetInQuote = async (pools: RawPoolInfo[]) => {
+		if (fromToken?.address && toToken?.address) {
+			const result: {amountIn: bigint, poolIndex: number} = await getInQuote(fromToken, toToken, amountOut, pools);
+
+			if (result.amountIn !== null && result.amountIn > 0n && result.amountIn < maxUint256) {
+				const amountInFormatted: string = Number(formatUnits(result.amountIn, fromToken.decimals)).toFixed(6);
+				setAmountIn(amountInFormatted);
+			}
+			else {
+
+			}
+			
+			if (result.poolIndex >= 0){
+				setPoolIndex(result.poolIndex);
+			}
+			
+			console.log("Estimated amount in:", result.amountIn.toString(), "from pool index:", result.poolIndex);
+		}
+	}
+
 	const onAmountInChange = (value: string) => {
 		console.log("Amount In changed:", value);
 		setAmountIn(value);
+		setTradeDirection(TradeDirection.TO);
 	}
 
-	const onAmountOutChange = async (amountOut: string) => {
+	const onAmountOutChange = async (value: string) => {
+		console.log("Amount Out changed:", value);
+		setAmountOut(value);
+		setTradeDirection(TradeDirection.FROM);
 	}
 
 	useEffect(() => {
 		const timerId = setTimeout(() => {
-			checkAndGetQuote(allPools);
+			if (tradeDirection === TradeDirection.TO)
+				checkAndGetOutQuote(allPools);
 		}, 500); // 500ms debounce
 		
 		return () => clearTimeout(timerId);
 		//eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [amountIn]);
+	}, [amountIn, fromToken, toToken]);
+
+	useEffect(() => {
+		const timerId = setTimeout(() => {
+			if (tradeDirection === TradeDirection.FROM)
+				checkAndGetInQuote(allPools);
+		}, 500); // 500ms debounce
+		
+		return () => clearTimeout(timerId);
+		//eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [amountOut, fromToken, toToken]);
 
 
 	useEffect(() => {
