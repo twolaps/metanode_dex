@@ -1,7 +1,7 @@
 import { client } from "@/config/client";
-import { poolManagerConfig } from "@/config/contracts";
-import { PairInfo, RawPoolInfo, TokenInfo } from "./types";
-import { Address, erc20Abi, isAddress } from "viem";
+import { poolManagerConfig, swapConfig } from "@/config/contracts";
+import { MAX_SQRT_PRICE, MIN_SQRT_PRICE, PairInfo, RawPoolInfo, TokenInfo } from "./types";
+import { Address, erc20Abi, isAddress, parseUnits } from "viem";
 
 export async function getSwapTokenMap(): Promise<Map<Address, TokenInfo>> {
 	let rawPools: RawPoolInfo[] = [];
@@ -95,6 +95,32 @@ export async function getPairs(): Promise<PairInfo[]> {
 	return pairInfos;
 }
 
-export function checkPairsAvailability(fromToken: TokenInfo | null, toToken: TokenInfo | null) {
-		
-}
+export async function getQuote(
+	fromToken: TokenInfo, 
+	toToken: TokenInfo,
+	amountIn: string): Promise<string> {
+		if (!amountIn || Number(amountIn) <= 0) return "0.0000";
+
+		const amountInBigint: bigint = parseUnits(amountIn, fromToken.decimals);
+
+		const isLower: boolean = fromToken.address.toLowerCase() < toToken.address.toLowerCase();
+
+		const limit: bigint = isLower ? MIN_SQRT_PRICE : MAX_SQRT_PRICE;
+
+		const amountOut = await client.readContract({
+			...swapConfig,
+			functionName: "quoteExactInput",
+			args: [
+				{
+					tokenIn: fromToken.address,
+					tokenOut: toToken.address,
+					indexPath: [0], // 默认路径索引数组
+					amountIn: amountInBigint,
+					sqrtPriceLimitX96: limit
+				}
+			],
+		});
+
+		console.log("Quoted amountOut:", amountOut);
+		return amountOut.toString();
+	}

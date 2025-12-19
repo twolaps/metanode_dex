@@ -36,3 +36,6 @@ export interface PairInfo {
 	token0: Address;
 	token1: Address;
 }
+
+export const MIN_SQRT_PRICE: bigint = BigInt("4295128739");
+export const MAX_SQRT_PRICE: bigint = BigInt("1461446703485210103287273052203988822378723970342");

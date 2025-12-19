@@ -1,9 +1,13 @@
-import { Address } from "viem";
 import { poolManagerABI } from "./PoolManagerABI";
-
-export const poolManagerAddress: Address = "0xddC12b3F9F7C91C79DA7433D8d212FB78d609f7B";
+import { poolContract, swapContract } from "./contract_address";
+import { swapABI } from "./swapABI";
 
 export const poolManagerConfig = {
-  address: poolManagerAddress,
+  address: poolContract,
   abi: poolManagerABI,
+} as const;
+
+export const swapConfig = {
+	address: swapContract,
+	abi: swapABI,
 } as const;
