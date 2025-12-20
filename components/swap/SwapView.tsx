@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { SwapButton } from "./SwapButton";
 import { SwapTokenInput } from "./SwapTokenInput";
 import { SwitchTokenButton } from "./SwitchTokenButton";
-import { InQuoteInfo, OutQuoteInfo, PairInfo, SwapError, RawPoolInfo, TokenInfo, TradeDirection } from "@/app/tools/types";
+import { InQuoteInfo, OutQuoteInfo, PairInfo, SwapStatus, RawPoolInfo, TokenInfo, TradeDirection, BUTTON_CONFIG } from "@/app/tools/types";
 import { getPairs, getPools, getOutQuote, getSwapTokenMap, getInQuote } from "@/app/tools/swapMath";
 import { Address, formatEther, formatUnits, maxUint256, parseEther } from "viem";
 import { showQuoteToaster } from "@/app/tools/toaster";
@@ -24,7 +24,7 @@ export default function SwapView() {
 
 	const [tradeDirection, setTradeDirection] = useState<TradeDirection>(TradeDirection.TO);
 
-	const [swapError, setSwapError] = useState<SwapError>(SwapError.NONE);
+	const [swapError, setSwapError] = useState<SwapStatus>(SwapStatus.INVALID_AMOUNT);
 
 	const titleClass: string = [
 		'w-fit',
@@ -83,17 +83,19 @@ export default function SwapView() {
 
 	const checkAndGetOutQuote = async (pools: RawPoolInfo[]) => {
 		if (fromToken?.address && toToken?.address) {
+
 			if (fromToken.address === toToken.address) {
-				setSwapError(SwapError.SAME_TOKEN);
-				showQuoteToaster(SwapError.SAME_TOKEN);
+				setSwapError(SwapStatus.SAME_TOKEN);
+				showQuoteToaster(SwapStatus.SAME_TOKEN);
 				setAmountOut("")
 				return;
 			}
 
+			setSwapError(SwapStatus.QUOTING);
 			const result: OutQuoteInfo = await getOutQuote(fromToken, toToken, amountIn, pools);
-			setSwapError(result.error)
+			setSwapError(result.error);
 
-			if (result.error !== SwapError.NONE) {
+			if (result.error !== SwapStatus.NONE) {
 				showQuoteToaster(result.error);
 			}
 
@@ -116,14 +118,15 @@ export default function SwapView() {
 	const checkAndGetInQuote = async (pools: RawPoolInfo[]) => {
 		if (fromToken?.address && toToken?.address) {
 			if (fromToken.address === toToken.address) {
-				setSwapError(SwapError.SAME_TOKEN);
-				showQuoteToaster(SwapError.SAME_TOKEN);
+				setSwapError(SwapStatus.SAME_TOKEN);
+				showQuoteToaster(SwapStatus.SAME_TOKEN);
 				setAmountIn("")
 				return;
 			}
 
+			setSwapError(SwapStatus.QUOTING);
 			const result: InQuoteInfo = await getInQuote(fromToken, toToken, amountOut, pools);
-			setSwapError(result.error)
+			setSwapError(result.error);
 
 			if (result.amountIn !== null && result.amountIn > 0n && result.amountIn < maxUint256) {
 				const amountInFormatted: string = Number(formatUnits(result.amountIn, fromToken.decimals)).toFixed(6);
@@ -193,14 +196,6 @@ export default function SwapView() {
 	}, []);
 
 
-	const getButtonText = () => {
-    if (swapError === SwapError.SAME_TOKEN) return "代币相同";
-    if (swapError === SwapError.NO_POOL) return "暂无交易路径";
-    if (swapError === SwapError.INSUFFICIENT_LIQUIDITY) return "流动性不足";
-    if (!amountIn) return "输入金额";
-    return "立即兑换";
-};
-
 	return (
 		<div className="
 			w-[550px]
@@ -236,7 +231,7 @@ export default function SwapView() {
 					onAmountChange={onAmountOutChange}
 					amount={amountOut}
 				/>
-				<SwapButton getButtonText={getButtonText} disabled={!(swapError == SwapError.NONE && Number(amountIn) > 0 && Number(amountOut) > 0)} />
+				<SwapButton buttonConfig={BUTTON_CONFIG[swapError]} />
 			</div>
 		</div>
 	);
