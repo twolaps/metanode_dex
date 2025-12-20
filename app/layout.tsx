@@ -1,6 +1,7 @@
 import { HeaderView } from "@/components/common/HeaderView";
 import ClientLayout from "./ClientLayout";
 import { Separator } from "@/components/ui/separator";
+import { Toaster } from 'sonner';
 
 export const metadata = {
   title: "Metanode Swap",
@@ -13,6 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			<HeaderView/>
 			<Separator className="h-2 w-full" style={{ backgroundColor: "rgba(120, 120, 180, 0.3)" }} />
 			{children}
+			<Toaster position="top-center" richColors />
 		</ClientLayout>
 	)
 }

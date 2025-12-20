@@ -1,6 +1,6 @@
 import { client } from "@/config/client";
 import { poolManagerConfig, swapConfig } from "@/config/contracts";
-import { MAX_SQRT_PRICE, MIN_SQRT_PRICE, PairInfo, RawPoolInfo, TokenInfo } from "./types";
+import { InQuoteInfo, MAX_SQRT_PRICE, MIN_SQRT_PRICE, OutQuoteInfo, PairInfo, SwapError, RawPoolInfo, TokenInfo } from "./types";
 import { Address, erc20Abi, isAddress, maxUint256, parseUnits } from "viem";
 
 export async function getPools(): Promise<RawPoolInfo[]> {
@@ -129,10 +129,10 @@ export async function getOutQuote(
 	toToken: TokenInfo,
 	amountIn: string,
 	pools: RawPoolInfo[]
-): Promise<{amountOut: bigint, poolIndex: number}> {
+): Promise<OutQuoteInfo> {
 
 	console.log("Getting quote for:", {fromToken, toToken, amountIn});
-	if (!amountIn || Number(amountIn) <= 0) return {amountOut: 0n, poolIndex: -1};
+	if (!amountIn || Number(amountIn) <= 0) return {amountOut: 0n, poolIndex: -1, error: SwapError.INVALID_AMOUNT};
 	const amountInBigint: bigint = parseUnits(amountIn, fromToken.decimals);
 	const isLower: boolean = fromToken.address.toLowerCase() < toToken.address.toLowerCase();
 	const limit: bigint = isLower ? MIN_SQRT_PRICE + 1n : MAX_SQRT_PRICE - 1n;
@@ -140,7 +140,7 @@ export async function getOutQuote(
 
 	if (candidatePools.length === 0) {
 		console.warn("No available pools for the given token pair.");
-		return {amountOut: 0n, poolIndex: -1};
+		return {amountOut: 0n, poolIndex: -1, error: SwapError.NO_POOL};
 	}
 
 	console.log(candidatePools);
@@ -166,7 +166,7 @@ export async function getOutQuote(
 		}
 		catch (error) {
 			console.error(`Error quoting on pool ${pool.index}:`, error);
-			return {amountOut: 0n, poolIndex: pool.index};
+			return {amountOut: 0n, poolIndex: pool.index, error: SwapError.INSUFFICIENT_LIQUIDITY};
 		}
 	});
 
@@ -183,9 +183,9 @@ export async function getOutQuote(
 	});
 
 	if (maxAmountOut === 0n) {
-		return {amountOut: 0n, poolIndex: -1};
+		return {amountOut: 0n, poolIndex: -1, error: SwapError.INSUFFICIENT_LIQUIDITY};
 	}
-	return {amountOut: maxAmountOut, poolIndex: maxIndex};
+	return {amountOut: maxAmountOut, poolIndex: maxIndex, error: SwapError.NONE};
 }
 
 
@@ -194,10 +194,10 @@ export async function getInQuote(
 	toToken: TokenInfo,
 	amountOut: string,
 	pools: RawPoolInfo[]
-): Promise<{amountIn: bigint, poolIndex: number}> {
+): Promise<InQuoteInfo> {
 
 	console.log("Getting quote for:", {fromToken, toToken, amountOut});
-	if (!amountOut || Number(amountOut) <= 0) return {amountIn: 0n, poolIndex: -1};
+	if (!amountOut || Number(amountOut) <= 0) return {amountIn: 0n, poolIndex: -1, error: SwapError.INVALID_AMOUNT};
 	const amountOutBigint: bigint = parseUnits(amountOut, toToken.decimals);
 	const isLower: boolean = fromToken.address.toLowerCase() < toToken.address.toLowerCase();
 	const limit: bigint = isLower ? MIN_SQRT_PRICE + 1n : MAX_SQRT_PRICE - 1n;
@@ -205,7 +205,7 @@ export async function getInQuote(
 
 	if (candidatePools.length === 0) {
 		console.warn("No available pools for the given token pair.");
-		return {amountIn: 0n, poolIndex: -1};
+		return {amountIn: 0n, poolIndex: -1, error: SwapError.NO_POOL};
 	}
 
 	console.log(candidatePools);
@@ -227,11 +227,11 @@ export async function getInQuote(
 				],
 			});
 			console.log(`Quote from pool ${pool.index}:`, result);
-			return {amountIn: result as bigint, poolIndex: pool.index};
+			return {amountIn: result as bigint, poolIndex: pool.index, error: SwapError.NONE};
 		}
 		catch (error) {
 			console.error(`Error quoting on pool ${pool.index}:`, error);
-			return {amountIn: 0n, poolIndex: pool.index};
+			return {amountIn: 0n, poolIndex: pool.index, error: SwapError.INSUFFICIENT_LIQUIDITY};
 		}
 	});
 
@@ -248,8 +248,8 @@ export async function getInQuote(
 	});
 
 	if (minAmountIn === maxUint256) {
-		return {amountIn: 0n, poolIndex: -1};
+		return {amountIn: 0n, poolIndex: -1, error: SwapError.INSUFFICIENT_LIQUIDITY};
 	}
 	
-	return {amountIn: minAmountIn, poolIndex: minIndex};
+	return {amountIn: minAmountIn, poolIndex: minIndex, error: SwapError.NONE};
 }

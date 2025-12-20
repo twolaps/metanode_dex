@@ -44,3 +44,25 @@ export enum TradeDirection {
 	FROM = 'from',
 	TO = 'to',
 }
+
+export enum SwapError {
+    NONE = 'NONE',                          // 正常状态
+    INVALID_AMOUNT = 'INVALID_AMOUNT',      // 输入了 0 或非数字
+    SAME_TOKEN = 'SAME_TOKEN',              // 选了两个一样的代币
+    NO_POOL = 'NO_POOL',                    // 没池子（报价前或报价后发现）
+    INSUFFICIENT_LIQUIDITY = 'INSUFFICIENT_LIQUIDITY', // 池子深度不够
+    INSUFFICIENT_BALANCE = 'INSUFFICIENT_BALANCE',     // 余额不足（后续可以加）
+    FETCH_FAILED = 'FETCH_FAILED'           // 网络/合约调用失败
+}
+
+export interface InQuoteInfo{
+	amountIn: bigint;
+	poolIndex: number;
+	error: SwapError
+}
+
+export interface OutQuoteInfo{
+	amountOut: bigint;
+	poolIndex: number;
+	error: SwapError;
+}

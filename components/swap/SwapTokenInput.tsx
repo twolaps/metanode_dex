@@ -53,7 +53,7 @@ export const SwapTokenInput = ({
 		<div className={`w-full flex items-center flex-col mt-${mt} mb-${mb}`}>
 			<h1 className="text-[#99A1AF] text-base mr-auto ml-5 mb-2">{fromOrTo === 'from' ? '从' : '到'}</h1>
 			<div className="flex relative">
-				<Input value={amount} onChange={(e) => onAmountChange(e.target.value)} type="number" disabled={!canInput} placeholder="0.0000" className={inputClass} />
+				<Input value={amount} onChange={(e) => onAmountChange(e.target.value)} type="number" disabled={!canInput} placeholder="0.000000" className={inputClass} />
 				<SelectTokenBox selectableTokensMap={selectableTokensMap} onTokenSelect={onTokenSelect} selectedToken={selectedToken} setToken={setToken} />
 			</div>
 		</div>

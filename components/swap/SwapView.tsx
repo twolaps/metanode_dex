@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { SwapButton } from "./SwapButton";
 import { SwapTokenInput } from "./SwapTokenInput";
 import { SwitchTokenButton } from "./SwitchTokenButton";
-import { PairInfo, RawPoolInfo, TokenInfo, TradeDirection } from "@/app/tools/types";
+import { InQuoteInfo, OutQuoteInfo, PairInfo, SwapError, RawPoolInfo, TokenInfo, TradeDirection } from "@/app/tools/types";
 import { getPairs, getPools, getOutQuote, getSwapTokenMap, getInQuote } from "@/app/tools/swapMath";
-import { Address, formatUnits, maxUint256 } from "viem";
+import { Address, formatEther, formatUnits, maxUint256 } from "viem";
+import { showQuoteToaster } from "@/app/tools/toaster";
 
 export default function SwapView() {
 
@@ -80,7 +81,10 @@ export default function SwapView() {
 
 	const checkAndGetOutQuote = async (pools: RawPoolInfo[]) => {
 		if (fromToken?.address && toToken?.address) {
-			const result: {amountOut: bigint, poolIndex: number} = await getOutQuote(fromToken, toToken, amountIn, pools);
+			const result: OutQuoteInfo = await getOutQuote(fromToken, toToken, amountIn, pools);
+			if (result.error != SwapError.NONE) {
+				showQuoteToaster(result);
+			}
 
 			if (result.amountOut !== null) {
 				const amountOutFormatted: string = Number(formatUnits(result.amountOut, toToken.decimals)).toFixed(6);
@@ -97,14 +101,13 @@ export default function SwapView() {
 
 	const checkAndGetInQuote = async (pools: RawPoolInfo[]) => {
 		if (fromToken?.address && toToken?.address) {
-			const result: {amountIn: bigint, poolIndex: number} = await getInQuote(fromToken, toToken, amountOut, pools);
-
+			const result: InQuoteInfo = await getInQuote(fromToken, toToken, amountOut, pools);
+			if (result.error != SwapError.NONE) {
+				showQuoteToaster(result);
+			}
 			if (result.amountIn !== null && result.amountIn > 0n && result.amountIn < maxUint256) {
 				const amountInFormatted: string = Number(formatUnits(result.amountIn, fromToken.decimals)).toFixed(6);
 				setAmountIn(amountInFormatted);
-			}
-			else {
-
 			}
 			
 			if (result.poolIndex >= 0){
