@@ -4,7 +4,7 @@ import { SwapTokenInput } from "./SwapTokenInput";
 import { SwitchTokenButton } from "./SwitchTokenButton";
 import { InQuoteInfo, OutQuoteInfo, PairInfo, SwapError, RawPoolInfo, TokenInfo, TradeDirection } from "@/app/tools/types";
 import { getPairs, getPools, getOutQuote, getSwapTokenMap, getInQuote } from "@/app/tools/swapMath";
-import { Address, formatEther, formatUnits, maxUint256 } from "viem";
+import { Address, formatEther, formatUnits, maxUint256, parseEther } from "viem";
 import { showQuoteToaster } from "@/app/tools/toaster";
 
 export default function SwapView() {
@@ -86,6 +86,7 @@ export default function SwapView() {
 			if (fromToken.address === toToken.address) {
 				setSwapError(SwapError.SAME_TOKEN);
 				showQuoteToaster(SwapError.SAME_TOKEN);
+				setAmountOut("")
 				return;
 			}
 
@@ -96,9 +97,12 @@ export default function SwapView() {
 				showQuoteToaster(result.error);
 			}
 
-			if (result.amountOut !== null) {
+			if (result.amountOut !== null && result.amountOut > 0n && result.amountOut < maxUint256) {
 				const amountOutFormatted: string = Number(formatUnits(result.amountOut, toToken.decimals)).toFixed(6);
 				setAmountOut(amountOutFormatted);
+			}
+			else {
+				setAmountOut("");
 			}
 			
 			if (result.poolIndex >= 0){
@@ -114,6 +118,7 @@ export default function SwapView() {
 			if (fromToken.address === toToken.address) {
 				setSwapError(SwapError.SAME_TOKEN);
 				showQuoteToaster(SwapError.SAME_TOKEN);
+				setAmountIn("")
 				return;
 			}
 
@@ -123,6 +128,9 @@ export default function SwapView() {
 			if (result.amountIn !== null && result.amountIn > 0n && result.amountIn < maxUint256) {
 				const amountInFormatted: string = Number(formatUnits(result.amountIn, fromToken.decimals)).toFixed(6);
 				setAmountIn(amountInFormatted);
+			}
+			else {
+				setAmountIn("");
 			}
 			
 			if (result.poolIndex >= 0){
@@ -228,7 +236,7 @@ export default function SwapView() {
 					onAmountChange={onAmountOutChange}
 					amount={amountOut}
 				/>
-				<SwapButton getButtonText={getButtonText} />
+				<SwapButton getButtonText={getButtonText} disabled={!(swapError == SwapError.NONE && Number(amountIn) > 0 && Number(amountOut) > 0)} />
 			</div>
 		</div>
 	);
