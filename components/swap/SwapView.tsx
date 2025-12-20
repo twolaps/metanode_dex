@@ -24,6 +24,8 @@ export default function SwapView() {
 
 	const [tradeDirection, setTradeDirection] = useState<TradeDirection>(TradeDirection.TO);
 
+	const [swapError, setSwapError] = useState<SwapError>(SwapError.NONE);
+
 	const titleClass: string = [
 		'w-fit',
 		'text-5xl',
@@ -61,29 +63,37 @@ export default function SwapView() {
 
 	
 
-	let pairsAvailable: boolean = false;
-	if (!pairs || pairs.length === 0) {
-		pairsAvailable = false;
-	}
-	else {
-		pairsAvailable = pairs.some((pairInfo: PairInfo) => {
-			if (fromToken?.address === pairInfo.token0 && toToken?.address === pairInfo.token1) {
-				return true;
-			}
-			else if (fromToken?.address === pairInfo.token1 && toToken?.address === pairInfo.token0) {
-				return true;
-			}
-			else {
-				return false;
-			}
-		});	
-	}
+	// let pairsAvailable: boolean = false;
+	// if (!pairs || pairs.length === 0) {
+	// 	pairsAvailable = false;
+	// }
+	// else {
+	// 	pairsAvailable = pairs.some((pairInfo: PairInfo) => {
+	// 		if (fromToken?.address === pairInfo.token0 && toToken?.address === pairInfo.token1) {
+	// 			return true;
+	// 		}
+	// 		else if (fromToken?.address === pairInfo.token1 && toToken?.address === pairInfo.token0) {
+	// 			return true;
+	// 		}
+	// 		else {
+	// 			return false;
+	// 		}
+	// 	});	
+	// }
 
 	const checkAndGetOutQuote = async (pools: RawPoolInfo[]) => {
 		if (fromToken?.address && toToken?.address) {
+			if (fromToken.address === toToken.address) {
+				setSwapError(SwapError.SAME_TOKEN);
+				showQuoteToaster(SwapError.SAME_TOKEN);
+				return;
+			}
+
 			const result: OutQuoteInfo = await getOutQuote(fromToken, toToken, amountIn, pools);
-			if (result.error != SwapError.NONE) {
-				showQuoteToaster(result);
+			setSwapError(result.error)
+
+			if (result.error !== SwapError.NONE) {
+				showQuoteToaster(result.error);
 			}
 
 			if (result.amountOut !== null) {
@@ -101,10 +111,15 @@ export default function SwapView() {
 
 	const checkAndGetInQuote = async (pools: RawPoolInfo[]) => {
 		if (fromToken?.address && toToken?.address) {
-			const result: InQuoteInfo = await getInQuote(fromToken, toToken, amountOut, pools);
-			if (result.error != SwapError.NONE) {
-				showQuoteToaster(result);
+			if (fromToken.address === toToken.address) {
+				setSwapError(SwapError.SAME_TOKEN);
+				showQuoteToaster(SwapError.SAME_TOKEN);
+				return;
 			}
+
+			const result: InQuoteInfo = await getInQuote(fromToken, toToken, amountOut, pools);
+			setSwapError(result.error)
+
 			if (result.amountIn !== null && result.amountIn > 0n && result.amountIn < maxUint256) {
 				const amountInFormatted: string = Number(formatUnits(result.amountIn, fromToken.decimals)).toFixed(6);
 				setAmountIn(amountInFormatted);
@@ -169,6 +184,15 @@ export default function SwapView() {
 		fetchPairs();
 	}, []);
 
+
+	const getButtonText = () => {
+    if (swapError === SwapError.SAME_TOKEN) return "代币相同";
+    if (swapError === SwapError.NO_POOL) return "暂无交易路径";
+    if (swapError === SwapError.INSUFFICIENT_LIQUIDITY) return "流动性不足";
+    if (!amountIn) return "输入金额";
+    return "立即兑换";
+};
+
 	return (
 		<div className="
 			w-[550px]
@@ -204,8 +228,7 @@ export default function SwapView() {
 					onAmountChange={onAmountOutChange}
 					amount={amountOut}
 				/>
-				<SwapButton />
-				<h1 className={`text-red-400 mt-3 ${pairsAvailable || !fromToken || !toToken ? 'hidden' : ''}`}>流动性不足</h1>
+				<SwapButton getButtonText={getButtonText} />
 			</div>
 		</div>
 	);
