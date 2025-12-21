@@ -3,8 +3,9 @@ import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Command, CommandEmpty, CommandGroup, CommandItem } from "../ui/command";
 import { TokenInfo } from "@/app/tools/types";
-import { Address } from "viem";
+import { Address, stringify } from "viem";
 import { JSX, useState } from "react";
+import { shortenAddress } from "@/utils/format";
 
 interface SelectTokenBoxProps {
 	selectableTokensMap: Map<Address, TokenInfo>;
@@ -29,6 +30,7 @@ export const SelectTokenBox = ({ selectableTokensMap, onTokenSelect, selectedTok
 	].join(' ');
 
 	const tokensArray: TokenInfo[] = Array.from(selectableTokensMap.values());
+	tokensArray.sort((a, b) => a.symbol.localeCompare(b.symbol));
 
 	const onSelect = (token: TokenInfo) => {
 		if (onTokenSelect) {
@@ -55,7 +57,11 @@ export const SelectTokenBox = ({ selectableTokensMap, onTokenSelect, selectedTok
 			<CommandItem 
 				key={token.address}
 				onSelect={() => onSelect(token)}>
-				{token.symbol}
+
+				<div className="flex justify-between w-full">
+					<h1>{token.symbol}</h1>
+					<h1 className="text-gray-500">({shortenAddress(token.address)})</h1>
+				</div>
 			</CommandItem>);
 
 		commandItems.push(commandItem);

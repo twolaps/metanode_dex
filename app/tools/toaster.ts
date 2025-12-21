@@ -8,4 +8,7 @@ export function showQuoteToaster(error: SwapStatus) {
 	else if (error === SwapStatus.NO_POOL) {
 		toast.error("该交易对尚未开启交易")
 	}
+	else if (error === SwapStatus.INSUFFICIENT_BALANCE) {
+		toast.error("余额不足")
+	}
 }

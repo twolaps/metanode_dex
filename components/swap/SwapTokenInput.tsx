@@ -12,6 +12,7 @@ interface SwapTokenInputProps {
 	setToken: (token: TokenInfo | null) => void;
 	onAmountChange: (amount: string) => void;
 	amount: string;
+	balance: string
 }
 
 export const SwapTokenInput = ({
@@ -23,6 +24,7 @@ export const SwapTokenInput = ({
 	setToken,
 	onAmountChange,
 	amount,
+	balance
 }: SwapTokenInputProps) => {
 
 	let canInput: boolean = false;
@@ -50,8 +52,12 @@ export const SwapTokenInput = ({
 	}
 
 	return (
-		<div className={`w-full flex items-center flex-col mt-${mt} mb-${mb}`}>
-			<h1 className="text-[#99A1AF] text-base mr-auto ml-5 mb-2">{fromOrTo === 'from' ? '从' : '到'}</h1>
+		<div className={`w-full flex items-start flex-col mt-${mt} mb-${mb}`}>
+			<div className={`w-[93%] flex justify-between`}>
+				<h1 className="text-[#99A1AF] text-base">{fromOrTo === 'from' ? '从' : '到'}</h1>
+				<h1 className="text-[#99A1AF] text-base">余额：{balance}</h1>
+			</div>
+			
 			<div className="flex relative">
 				<Input value={amount} onChange={(e) => onAmountChange(e.target.value)} type="number" disabled={!canInput} placeholder="0.000000" className={inputClass} />
 				<SelectTokenBox selectableTokensMap={selectableTokensMap} onTokenSelect={onTokenSelect} selectedToken={selectedToken} setToken={setToken} />

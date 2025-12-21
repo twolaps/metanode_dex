@@ -7,7 +7,7 @@ interface SwapButtonProps {
 	};
 }
 export const SwapButton = ({ buttonConfig }: SwapButtonProps) => {
-
+	console.log("SwapButton - buttonConfig:", buttonConfig);
 	// 1. 获取当前要显示的文字
 	
   // 2. 逻辑判断：如果文字不是“立即交换”或“交 换”，则认为处于错误或未就绪状态

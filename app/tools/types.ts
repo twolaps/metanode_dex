@@ -51,7 +51,7 @@ export enum SwapStatus {
     SAME_TOKEN = 'SAME_TOKEN',              // 选了两个一样的代币
     NO_POOL = 'NO_POOL',                    // 没池子（报价前或报价后发现）
     INSUFFICIENT_LIQUIDITY = 'INSUFFICIENT_LIQUIDITY', // 池子深度不够
-    INSUFFICIENT_BALANCE = 'INSUFFICIENT_BALANCE',     // 余额不足（后续可以加）
+    INSUFFICIENT_BALANCE = 'INSUFFICIENT_BALANCE',     // 余额不足
     FETCH_FAILED = 'FETCH_FAILED',           // 网络/合约调用失败
 		QUOTING = 'QUOTING'                     // 报价中
 }
