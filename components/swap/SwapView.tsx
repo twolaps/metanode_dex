@@ -229,6 +229,14 @@ export default function SwapView() {
 		}
 	}
 
+	const onClickSwitchTokens = () => {
+		if (fromToken || toToken) {
+			const oldFrom = fromToken;
+			setFromToken(toToken);
+			setToToken(oldFrom);
+		}
+	}
+
 	// --- 链上交互 (Wagmi Hooks) ---
 
 	const { address: userAddress } = useAccount();
@@ -419,7 +427,7 @@ export default function SwapView() {
 				/>
 				
 				{/* 切换按钮 (暂未实现逻辑，仅 UI) */}
-				<SwitchTokenButton />
+				<SwitchTokenButton onClick={onClickSwitchTokens}/>
 				<SwapTokenInput
 					fromOrTo="to"
 					mt={0}

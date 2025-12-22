@@ -1,6 +1,10 @@
 import { Button } from "../ui/button";
 
-export const SwitchTokenButton = () => {
+interface SwitchTokenButtonProps {
+	onClick: () => void;
+}
+
+export const SwitchTokenButton = ({ onClick }: SwitchTokenButtonProps) => {
 	const btnClass: string = [
 		'w-10',
 		'h-10',
@@ -16,7 +20,7 @@ export const SwitchTokenButton = () => {
 	].join(' ');
 
 	return (
-		<Button className={btnClass}>
+		<Button className={btnClass} onClick={onClick}>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 24 24"
