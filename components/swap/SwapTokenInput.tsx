@@ -40,7 +40,6 @@ export const SwapTokenInput = ({
 		'border',
 		'border-[#2F2C38]',
 		'px-4',
-		'text-black',
 		'!text-3xl',
 		'placeholder:text-[#555555]',
 		'focus:outline-none',

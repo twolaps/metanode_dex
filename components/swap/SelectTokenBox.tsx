@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Command, CommandEmpty, CommandGroup, CommandItem } from "../ui/command";
 import { TokenInfo } from "@/app/tools/types";
-import { Address, stringify } from "viem";
+import { Address } from "viem";
 import { JSX, useState } from "react";
 import { shortenAddress } from "@/utils/format";
 
@@ -21,10 +21,7 @@ export const SelectTokenBox = ({ selectableTokensMap, onTokenSelect, selectedTok
 		'mt-4',
 		'w-[120px]',
 		'h-10',
-		'bg-[#6E63F2]',
-		'text-white',
 		'rounded-[8px]',
-		'hover:bg-[#5a52d1]',
 		'absolute',
 		'right-2',
 	].join(' ');

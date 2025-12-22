@@ -28,6 +28,7 @@ export const useSwap = () => {
 		poolIndex: number,
 		direction: TradeDirection,
 		userAddress: Address,
+		slippage: string,
 	) => {
 		// 判定调用哪个合约函数：ExactInput 还是 ExactOutput
 		const isExactInput = direction === TradeDirection.TO;
@@ -52,7 +53,7 @@ export const useSwap = () => {
 					recipient: userAddress,
 					deadline: BigInt(Math.floor(Date.now() / 1000) + 60 * 20), // 当前时间 + 20 分钟
 					amountIn: amountInBI,
-					amountOutMinimum: amountOutBI * 995n / 1000n, // 设置滑点为0.5%
+					amountOutMinimum: amountOutBI * BigInt(Math.floor(10000 - parseFloat(slippage) * 100)) / 10000n, // 设置滑点
 					sqrtPriceLimitX96,
 				}],
 			});

@@ -18,7 +18,6 @@ export const HeaderView = () => {
 
 	const tabTriggerClass: string = [
 		'cursor-pointer',
-		'text-[#99A1AF]',
 		'text-2xl',
 		'data-[state=active]:bg-[#2F2C38]',
 		'data-[state=active]:text-white',

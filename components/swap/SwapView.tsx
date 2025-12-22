@@ -11,6 +11,9 @@ import { useTokenAllowance } from "@/hooks/useTokenAllowance";
 import { useApprove } from "@/hooks/useApprove";
 import { toast } from "sonner";
 import { useSwap } from "@/hooks/useSwap";
+import { SettingButton } from "./SettingButton";
+import { SlippageSetting } from "./SlippageSetting";
+import { cn } from "@/lib/utils";
 
 /**
  * 核心组件：SwapView
@@ -53,24 +56,28 @@ export default function SwapView() {
 	// 交易状态机：控制底部大按钮的文字和可用性 (例如：余额不足、报价中、输入无效)
 	const [swapError, setSwapError] = useState<SwapStatus>(SwapStatus.INVALID_AMOUNT);
 
+	const [showSettings, setShowSettings] = useState<boolean>(false);
+	const [slippage, setSlippage] = useState('0.5');
+
 
 	// --- 样式定义 (Tailwind CSS) ---
-	const titleClass: string = [
+	const titleClass: string = cn(
 		'w-fit', 'text-5xl', 'font-bold',
 		'bg-gradient-to-r', 'from-[#6E63F2]', 'to-[#F166BB]', 'bg-clip-text', 'text-transparent',
 		'text-[36px]',
-	].join(' ');
+	);
 
-	const descriptionClass: string = [
+	const descriptionClass: string = cn(
 		'w-fit', 'text-base', 'mt-2', 'text-[#99A1AF]',
-	].join(' ');
+	);
 
-	const radiusRectClass: string = [
-		'w-[545px]', 'h-[430px]', 'bg-[#1E1B27]', 'rounded-[16px]',
+	const radiusRectClass: string = cn(
+		'w-[545px]', showSettings ? 'h-[540px]' : 'h-[440px]', 'bg-card', 'rounded-[16px]',
 		'flex', 'items-center', 'px-4', 'mb-4',
 		'border', 'border-[#2F2C38]', 'mt-2',
 		'flex-col', 'relative',
-	].join(' ');
+	);
+
 
 	/**
 	 * 核心逻辑 A: 计算【卖出】报价 (Exact Input)
@@ -218,6 +225,7 @@ export default function SwapView() {
 						poolIndex,
 						tradeDirection,
 						userAddress,
+						slippage,
 					);
 					console.log("Swap transaction hash:", hash);
 					toast.success("交易已提交，等待上链...");
@@ -235,6 +243,13 @@ export default function SwapView() {
 			setFromToken(toToken);
 			setToToken(oldFrom);
 		}
+		else {
+			toast.error("请先选择代币！");
+		}
+	}
+
+	const onClickSettings = () => {
+		setShowSettings(!showSettings);
 	}
 
 	// --- 链上交互 (Wagmi Hooks) ---
@@ -413,6 +428,8 @@ export default function SwapView() {
 			</h3>
 
 			<div className={radiusRectClass}>
+				<SettingButton onClick={onClickSettings}></SettingButton>
+				{showSettings && <SlippageSetting slippage={slippage} setSlippage={setSlippage}/>}
 				{/* 上方输入框 (From) */}
 				<SwapTokenInput
 					fromOrTo="from"

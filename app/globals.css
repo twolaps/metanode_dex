@@ -81,39 +81,38 @@
    --sidebar-ring:  oklch(0.708 0 0);
  }
 
- .dark {
-   --background:  oklch(0.141 0.005 285.823);
-   --foreground:  oklch(0.985 0 0);
-   --card:  oklch(0.21 0.006 285.885);
-   --card-foreground:  oklch(0.985 0 0);
-   --popover:  oklch(0.21 0.006 285.885);
-   --popover-foreground:  oklch(0.985 0 0);
-   --primary:  oklch(0.488 0.243 264.376);
-   --primary-foreground:  oklch(0.97 0.014 254.604);
-   --secondary:  oklch(0.274 0.006 286.033);
-   --secondary-foreground:  oklch(0.985 0 0);
-   --muted:  oklch(0.274 0.006 286.033);
-   --muted-foreground:  oklch(0.705 0.015 286.067);
-   --accent:  oklch(0.274 0.006 286.033);
-   --accent-foreground:  oklch(0.985 0 0);
-   --destructive:  oklch(0.704 0.191 22.216);
-   --border:  oklch(1 0 0 / 10%);
-   --input:  oklch(1 0 0 / 15%);
-   --ring:  oklch(0.556 0 0);
-   --chart-1:  oklch(0.809 0.105 251.813);
-   --chart-2:  oklch(0.623 0.214 259.815);
-   --chart-3:  oklch(0.546 0.245 262.881);
-   --chart-4:  oklch(0.488 0.243 264.376);
-   --chart-5:  oklch(0.424 0.199 265.638);
-   --sidebar:  oklch(0.21 0.006 285.885);
-   --sidebar-foreground:  oklch(0.985 0 0);
-   --sidebar-primary:  oklch(0.623 0.214 259.815);
-   --sidebar-primary-foreground:  oklch(0.97 0.014 254.604);
-   --sidebar-accent:  oklch(0.274 0.006 286.033);
-   --sidebar-accent-foreground:  oklch(0.985 0 0);
-   --sidebar-border:  oklch(1 0 0 / 10%);
-   --sidebar-ring:  oklch(0.439 0 0);
- }
+.dark {
+  /* --- 基础背景与卡片 (采用深蓝紫调) --- */
+  --background: oklch(0.141 0.012 268); 
+  --foreground: oklch(0.985 0.01 268);
+  
+  --card: oklch(0.19 0.015 268);
+  --card-foreground: oklch(0.985 0.01 268);
+
+  /* --- 核心按钮配置 (重点) --- */
+  /* 主色: #6E63F2 */
+  --primary: oklch(0.5889 0.207 281.42); 
+  /* 按钮文字: 接近纯白，保持极低彩度以显高级 */
+  --primary-foreground: oklch(0.985 0.01 268);
+
+  /* --- 交互状态 --- */
+  /* 悬停状态 (Accent): 略微增加亮度和透明度感 */
+  --accent: oklch(0.30 0.04 268);
+  --accent-foreground: oklch(0.985 0.01 268);
+
+  /* --- 边框与输入框 --- */
+  /* 边框建议使用带透明度的白，能自动融入背景 */
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 8%);
+  --ring: oklch(0.5889 0.207 281.42);
+
+  /* --- 其他辅助色 --- */
+  --muted: oklch(0.25 0.02 268);
+  --muted-foreground: oklch(0.70 0.02 268);
+  
+  --popover: oklch(0.19 0.015 268);
+  --popover-foreground: oklch(0.985 0.01 268);
+}
 
 @layer base {
   * {
