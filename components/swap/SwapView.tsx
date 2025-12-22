@@ -205,6 +205,11 @@ export default function SwapView() {
 						console.error("Swap parameters are incomplete.");
 						return;
 					}
+					console.log("Check Balance:", {
+						have: fromBalance?.value.toString(),
+						need: parseUnits(amountIn, fromToken?.decimals || 18).toString(),
+						isEnough: fromBalance && fromBalance.value >= parseUnits(amountIn, fromToken?.decimals || 18)
+					});
 					const hash = await swap(
 						fromToken,
 						toToken,
@@ -245,7 +250,9 @@ export default function SwapView() {
 	console.log("userAddress:", userAddress);
 
 
-	const {needsApprove, refetch: refetchAllowance} = useTokenAllowance(fromToken, amountIn);
+	const {allowance, needsApprove, refetch: refetchAllowance} = useTokenAllowance(fromToken, amountIn);
+
+	console.log("Token Allowance:", allowance?.toString(), "Needs Approve:", needsApprove);
 
 	const {
 		approve, 
@@ -253,7 +260,7 @@ export default function SwapView() {
 		isSuccess: isApproveSuccess
 	} = useApprove(fromToken?.address);
 
-	const { swap, isSwaping, isSuccess: isSwapSuccess } = useSwap();
+	const { swap, isSwapping, isSuccess: isSwapSuccess } = useSwap();
 
 
 	// --- 副作用 (Effects) ---
@@ -364,7 +371,7 @@ export default function SwapView() {
 			};
 		}
 
-		if (isSwaping) {
+		if (isSwapping) {
 			return {
 				text: `交易中...`,
 				disabled: true,

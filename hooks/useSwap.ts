@@ -1,4 +1,4 @@
-import { TokenInfo, TradeDirection } from "@/app/tools/types";
+import { MAX_SQRT_PRICE, MIN_SQRT_PRICE, TokenInfo, TradeDirection } from "@/app/tools/types";
 import { swapConfig } from "@/config/contracts";
 import { Address, maxUint256, parseUnits } from "viem";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
@@ -36,6 +36,10 @@ export const useSwap = () => {
 		const amountInBI = parseUnits(amountIn, fromToken.decimals);
 		const amountOutBI = parseUnits(amountOut, toToken.decimals);
 
+		const sqrtPriceLimitX96: bigint = fromToken.address.toLowerCase() < toToken.address.toLowerCase()
+				? MIN_SQRT_PRICE + 1n
+				: MAX_SQRT_PRICE - 1n;
+
 		//调用合约
 		if (isExactInput) {
 			return await writeContractAsync({
@@ -48,8 +52,8 @@ export const useSwap = () => {
 					recipient: userAddress,
 					deadline: BigInt(Math.floor(Date.now() / 1000) + 60 * 20), // 当前时间 + 20 分钟
 					amountIn: amountInBI,
-					amountOutMinimum: amountOutBI,
-					sqrtPriceLimitX96: 0n,
+					amountOutMinimum: amountOutBI * 995n / 1000n, // 设置滑点为0.5%
+					sqrtPriceLimitX96,
 				}],
 			});
 		}
@@ -65,7 +69,7 @@ export const useSwap = () => {
 					deadline: BigInt(Math.floor(Date.now() / 1000) + 60 * 20), // 当前时间 + 20 分钟
 					amountOut: amountOutBI,
 					amountInMaximum: maxUint256,
-					sqrtPriceLimitX96: 0n,
+					sqrtPriceLimitX96,
 				}],
 			});
 		}
@@ -73,7 +77,7 @@ export const useSwap = () => {
 
 	return {
 		swap,
-		isSwaping: isPending || isConfirming,
+		isSwapping: isPending || isConfirming,
 		isSuccess,
 	}
 }
