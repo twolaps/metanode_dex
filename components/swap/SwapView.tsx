@@ -7,6 +7,10 @@ import { getPairs, getPools, getOutQuote, getSwapTokenMap, getInQuote } from "@/
 import { Address, formatUnits, maxUint256, parseUnits } from "viem";
 import { showQuoteToaster } from "@/app/tools/toaster";
 import { useAccount, useBalance } from "wagmi";
+import { useTokenAllowance } from "@/hooks/useTokenAllowance";
+import { useApprove } from "@/hooks/useApprove";
+import { toast } from "sonner";
+import { useSwap } from "@/hooks/useSwap";
 
 /**
  * 核心组件：SwapView
@@ -49,6 +53,7 @@ export default function SwapView() {
 	// 交易状态机：控制底部大按钮的文字和可用性 (例如：余额不足、报价中、输入无效)
 	const [swapError, setSwapError] = useState<SwapStatus>(SwapStatus.INVALID_AMOUNT);
 
+
 	// --- 样式定义 (Tailwind CSS) ---
 	const titleClass: string = [
 		'w-fit', 'text-5xl', 'font-bold',
@@ -89,7 +94,7 @@ export default function SwapView() {
 			const result: OutQuoteInfo = await getOutQuote(fromToken, toToken, amountIn, pools);
 			
 			// 4. 更新状态
-			if (fromToken?.address && fromBalance && parseUnits(amountIn, fromToken.decimals) > fromBalance.value) 
+			if (fromToken?.address && fromBalance && (amountIn ? parseUnits(amountIn, fromToken.decimals): 0n) > fromBalance.value) 
 			{
 				result.error = SwapStatus.INSUFFICIENT_BALANCE;
 				setSwapError(result.error);
@@ -141,7 +146,7 @@ export default function SwapView() {
 
 
 			// 4. 更新状态
-			if (fromToken?.address && fromBalance && parseUnits(amountIn, fromToken.decimals) > fromBalance.value) 
+			if (fromToken?.address && fromBalance && result.amountIn > fromBalance.value) 
 			{
 				result.error = SwapStatus.INSUFFICIENT_BALANCE;
 				setSwapError(result.error);
@@ -180,6 +185,45 @@ export default function SwapView() {
 		setTradeDirection(TradeDirection.FROM); // 标记方向：从下往上算
 	}
 
+	const onClickSwap = async () => {
+		console.log("Swap button clicked");
+
+		if (swapError === SwapStatus.NONE) {
+			if (needsApprove) {
+				try {
+					const hash = await approve();
+					console.log("Approve transaction hash:", hash);
+					toast.success("交易已提交，等待上链...");
+				}
+				catch (error) {
+					console.error("Approval failed:", error);
+				}
+			}
+			else {
+				try {
+					if (!fromToken || !toToken || !poolIndex || !userAddress) {
+						console.error("Swap parameters are incomplete.");
+						return;
+					}
+					const hash = await swap(
+						fromToken,
+						toToken,
+						amountIn,
+						amountOut,
+						poolIndex,
+						tradeDirection,
+						userAddress,
+					);
+					console.log("Swap transaction hash:", hash);
+					toast.success("交易已提交，等待上链...");
+				}
+				catch (error) {
+					console.error("Swap failed:", error);
+				}
+			}
+		}
+	}
+
 	// --- 链上交互 (Wagmi Hooks) ---
 
 	const { address: userAddress } = useAccount();
@@ -199,9 +243,44 @@ export default function SwapView() {
 	console.log("from Balance:", fromBalance);
 	console.log("fromToken:", fromToken);
 	console.log("userAddress:", userAddress);
-	
+
+
+	const {needsApprove, refetch: refetchAllowance} = useTokenAllowance(fromToken, amountIn);
+
+	const {
+		approve, 
+		isLoading: isApproving, 
+		isSuccess: isApproveSuccess
+	} = useApprove(fromToken?.address);
+
+	const { swap, isSwaping, isSuccess: isSwapSuccess } = useSwap();
+
 
 	// --- 副作用 (Effects) ---
+
+	useEffect(() => {
+		if (isApproveSuccess) {
+				console.log("授权成功，刷新额度数据...");
+				// 调用 useTokenAllowance 返回的 refetch 函数
+				refetchAllowance(); 
+				toast.success("授权成功！");
+				// 提示用户：授权成功！
+		}
+	//eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isApproveSuccess]);
+
+	useEffect(() => {
+		if (isSwapSuccess) {
+			console.log("交换成功，刷新余额数据...");
+			// 交易成功后，刷新余额
+			refetchFromBalance();
+			refetchToBalance();
+			setAmountIn("");
+			setAmountOut("");
+			toast.success("交易成功！");
+		}
+	//eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isSwapSuccess]);
 
 	/**
 	 * Effect: 监听【卖出金额】变化
@@ -277,6 +356,33 @@ export default function SwapView() {
 		fetchPairs();
 	}, []);
 
+	const getButtonConfig = () => {
+		if (isApproving) {
+			return {
+				text: `授权中...`,
+				disabled: true,
+			};
+		}
+
+		if (isSwaping) {
+			return {
+				text: `交易中...`,
+				disabled: true,
+			};
+		}
+
+		const baseConfig = BUTTON_CONFIG[swapError];
+		// 如果需要批准，覆盖文字和禁用状态
+		if (swapError === SwapStatus.NONE && needsApprove) {
+			return {
+				text: `授权${fromToken?.symbol}`,
+				disabled: false,
+			};
+		}
+
+		return baseConfig;
+	}
+
 	// --- 渲染 UI ---
 	return (
 		<div className="
@@ -318,7 +424,7 @@ export default function SwapView() {
 					amount={amountOut}
 					balance={Number(formatUnits(toBalance?.value ?? 0n, toToken?.decimals ?? 18)).toFixed(6)}
 				/>
-				<SwapButton buttonConfig={BUTTON_CONFIG[swapError]} />
+				<SwapButton buttonConfig={getButtonConfig()} onClick={onClickSwap}/>
 			</div>
 		</div>
 	);
