@@ -3,8 +3,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Separator } from "../ui/separator";
 import { AddLiquidityToken } from "./AddLiquidityToken";
 import { useState } from "react";
-import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
-import { cn } from "@/lib/utils";
 import { FeeGroup } from "./FeeGroup";
 import { SetPriceRange } from "./SetPriceRange";
 import { PriceRangePlaceholder } from "./PriceRangePlaceholder";
@@ -38,8 +36,11 @@ export const AddLiquidityDialog = ({ open, onClose }: AddLiquidityDialogProps) =
 					<Separator />
 				</DialogHeader>
 
-				<AddLiquidityToken index={0} onSelectToken={onSelectToken0} />
-				<AddLiquidityToken index={1} onSelectToken={onSelectToken1} />
+				<div className="w-full flex justify-between gap-4 mt-4 mb-2">
+					<AddLiquidityToken index={0} onSelectToken={onSelectToken0} />
+					<AddLiquidityToken index={1} onSelectToken={onSelectToken1} />
+				</div>
+				
 
 				<Separator />
 				<FeeGroup feeTier={feeTier} setFeeTier={setFeeTier} />

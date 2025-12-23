@@ -35,7 +35,7 @@ export const AddLiquidityToken = ({ index, onSelectToken }: AddLiquidityTokenPro
 	});
 
 	return (
-		<div className="flex flex-col">
+		<div className="flex flex-col w-full">
 			<h1 className="mb-2">代币{index == 0 ? "A" : "B"}</h1>
 			<Popover open={open} onOpenChange={setOpen}>
 				<PopoverTrigger className="w-full rounded h-8 border border-gray-300 flex items-center justify-between px-3 bg-gray-800">

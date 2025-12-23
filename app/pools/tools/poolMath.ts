@@ -18,7 +18,7 @@ export async function formatPoolInfos(): Promise<FormattedPoolInfo[]> {
 	catch (error) {
 		console.error("Error fetching pools:", error);
 	}
-	
+
 
 	// 1. 边界检查
 	if(!rawPools || rawPools.length === 0) {
