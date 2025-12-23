@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { ToggleGroup, ToggleGroupItem } from "@radix-ui/react-toggle-group"
 
 interface SlippageSettingProps {
@@ -13,14 +14,14 @@ export const SlippageSetting = ({ slippage, setSlippage }: SlippageSettingProps)
 		}
 	}	
 
-	const toggleItemClass: string = [
+	const toggleItemClass: string = cn(
 		'rounded-[8px]',
 		'w-20',
 		'h-8',
 		'text-white',
 		'data-[state=on]:bg-primary',
 		'border'
-	].join(' ');
+	);
 
 	return (
 		<div className="self-start bg-input/30 border-input border rounded-md px-3 py-1 mt-4 w-full flex items-start justify-center flex-col">
