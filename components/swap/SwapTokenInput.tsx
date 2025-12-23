@@ -53,7 +53,7 @@ export const SwapTokenInput = ({
 	return (
 		<div className={`w-full flex items-start flex-col mt-${mt} mb-${mb}`}>
 			<div className={`w-[100%] flex justify-between`}>
-				<h1 className="text-[#99A1AF] text-base">{fromOrTo === 'from' ? '从' : '到'}</h1>
+				<h1 className="text-[#99A1AF] text-base">{fromOrTo === 'from' ? '支付' : '获得'}</h1>
 				<h1 className="text-[#99A1AF] text-base">余额：{balance}</h1>
 			</div>
 			

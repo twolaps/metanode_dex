@@ -78,3 +78,26 @@ export const BUTTON_CONFIG: Record<SwapStatus, { text: string; disabled: boolean
 		[SwapStatus.INSUFFICIENT_BALANCE]: { text: "余额不足", disabled: true },
 		[SwapStatus.FETCH_FAILED]: { text: "获取报价失败", disabled: true },
 };
+
+export const SUPPORTED_TOKENS: TokenInfo[] = [
+  {
+    symbol: "MNTA",
+    address: "0x4798388e3adE569570Df626040F07DF71135C48E",
+    decimals: 18,
+  },
+  {
+    symbol: "MNTB",
+    address: "0x5A4eA3a013D42Cfd1B1609d19f6eA998EeE06D30",
+    decimals: 18,
+  },
+  {
+    symbol: "MNTC",
+    address: "0x86B5df6FF459854ca91318274E47F4eEE245CF28",
+    decimals: 18,
+  },
+  {
+    symbol: "MNTD", // 模拟 USDC
+    address: "0x7af86B1034AC4C925Ef5C3F637D1092310d83F03",
+    decimals: 18, // 
+  }
+];
