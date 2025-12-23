@@ -17,7 +17,7 @@ export const FormattedPoolsTable = ({ formattedPoolInfos }: FormattedPoolsTableP
 				<TableCell className="text-lg text-[#99A1AF] text-right w-[150px]">{poolInfo.price} {poolInfo.token1}</TableCell>
 				<TableCell className="text-lg text-[#99A1AF] text-right w-[150px]">{poolInfo.liquidity}</TableCell>
 				<TableCell className="text-center">
-					<Button>添加流动性</Button>
+					<Button>存入</Button>
 				</TableCell>
 			</TableRow>)
 			return tableCell;
