@@ -2,6 +2,7 @@ import { TokenInfo } from "@/app/tools/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Separator } from "../ui/separator";
 import { AddLiquidityToken } from "./AddLiquidityToken";
+import { useState } from "react";
 
 interface AddLiquidityDialogProps {
 	open: boolean;
@@ -10,14 +11,19 @@ interface AddLiquidityDialogProps {
 
 export const AddLiquidityDialog = ({ open, onClose }: AddLiquidityDialogProps) => {
 
+	const [token0, setToken0] = useState<TokenInfo | null>(null);
+	const [token1, setToken1] = useState<TokenInfo | null>(null);
+
 	const onSelectToken0 = (token: TokenInfo) => {
 		console.log("Selected token 0:", token);
+		setToken0(token);
 	}
 
 	const onSelectToken1 = (token: TokenInfo) => {
 		console.log("Selected token 1:", token);
+		setToken1(token);
 	}
-	
+
 	return (
 		<Dialog open={open} onOpenChange={onClose}>
 			<DialogContent>

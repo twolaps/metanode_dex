@@ -14,22 +14,20 @@ export const AddLiquidityToken = ({ index, onSelectToken }: AddLiquidityTokenPro
 	const [open, setOpen] = useState(false);
 	const [selectedToken, setSelectedToken] = useState<TokenInfo | null>(null);
 
-	const commandItems: JSX.Element[] = [];
-	for (let i = 0; i < SUPPORTED_TOKENS.length; i++) {
-
-		const onSelect = (index: string) => {
-			console.log("Selected token:", SUPPORTED_TOKENS[parseInt(index)]);
-			setOpen(false);
-			setSelectedToken(SUPPORTED_TOKENS[parseInt(index)]);
-			onSelectToken(SUPPORTED_TOKENS[parseInt(index)]);
-		}
-		const token: TokenInfo = SUPPORTED_TOKENS[i];
-		commandItems.push(
-			<CommandItem key={i} className="aria-selected:bg-primary!" value={`${i}`} onSelect={onSelect}>
-					<h1>{token.symbol}</h1>
-			</CommandItem>
-		);
-	}
+	const commandItems: JSX.Element[] = SUPPORTED_TOKENS.map((tokenInfo: TokenInfo)=>{
+			return (<CommandItem 
+				key={tokenInfo.symbol}
+				className="aria-selected:bg-primary!"
+				value={tokenInfo.symbol}
+				onSelect={()=>{
+					console.log("Selected token:", tokenInfo);
+					setOpen(false);
+					setSelectedToken(tokenInfo);
+					onSelectToken(tokenInfo);
+				}}>
+					<h1>{tokenInfo.symbol}</h1>
+			</CommandItem>);
+	});
 
 	return (
 		<div className="flex flex-col">
