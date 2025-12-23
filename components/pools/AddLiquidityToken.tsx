@@ -3,6 +3,7 @@ import { Command, CommandEmpty, CommandGroup, CommandItem } from "../ui/command"
 import { ChevronDown } from "lucide-react";
 import { JSX, useState } from "react";
 import { SUPPORTED_TOKENS, TokenInfo } from "@/app/tools/types";
+import { shortenAddress } from "@/utils/format";
 
 interface AddLiquidityTokenProps {
 	index: number;
@@ -25,13 +26,17 @@ export const AddLiquidityToken = ({ index, onSelectToken }: AddLiquidityTokenPro
 					setSelectedToken(tokenInfo);
 					onSelectToken(tokenInfo);
 				}}>
-					<h1>{tokenInfo.symbol}</h1>
+					<div className="flex justify-between w-full">
+						<h1>{tokenInfo.symbol}</h1>
+						<h1>({shortenAddress(tokenInfo.address)})</h1>
+					</div>
+					
 			</CommandItem>);
 	});
 
 	return (
 		<div className="flex flex-col">
-			<h1 className="mb-2">第{index == 0 ? "一" : "二"}个代币</h1>
+			<h1 className="mb-2">代币{index == 0 ? "A" : "B"}</h1>
 			<Popover open={open} onOpenChange={setOpen}>
 				<PopoverTrigger className="w-full rounded h-8 border border-gray-300 flex items-center justify-between px-3 bg-gray-800">
 					<h1>{selectedToken ? selectedToken.symbol : "选择代币"}</h1>
