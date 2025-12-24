@@ -1,5 +1,6 @@
 import { formatPrice } from "@/app/pools/tools/poolMath";
 import { FormattedPoolInfo } from "@/app/tools/types";
+import { TICK_SPACINGS, TickMath, nearestUsableTick } from '@uniswap/v3-sdk'
 
 interface DepositPriceRangeProps {
 	formattedPoolInfo: FormattedPoolInfo;
@@ -15,16 +16,16 @@ export const DepositPriceRange = ({ formattedPoolInfo }: DepositPriceRangeProps)
 	const priceUpper: string = formatPrice(1.0001 ** formattedPoolInfo?.rawPoolInfo.tickUpper * decimalAdjustment);
 
 	let rangeStr: string = '';
+	const tickSpacing: number = TICK_SPACINGS[formattedPoolInfo.rawPoolInfo.fee as keyof typeof TICK_SPACINGS];
+	const minTick: number = nearestUsableTick(TickMath.MIN_TICK, tickSpacing);
+	const maxTick: number = nearestUsableTick(TickMath.MAX_TICK, tickSpacing);
 
-	if (formattedPoolInfo.rawPoolInfo.tickLower === -887220 && formattedPoolInfo.rawPoolInfo.tickUpper === 887220) {
+	if (formattedPoolInfo.rawPoolInfo.tickLower === minTick && formattedPoolInfo.rawPoolInfo.tickUpper === maxTick) {
 		rangeStr = '当前价格区间：Full Range';
 	}
 	else {
 		rangeStr = `当前价格区间：${priceLower}  -  ${priceUpper} ${formattedPoolInfo.tokenInfo0.symbol}/${formattedPoolInfo.tokenInfo1.symbol}`
 	}
-
-	
-
 	
 	return (
 		<div>

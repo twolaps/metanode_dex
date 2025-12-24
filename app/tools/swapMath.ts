@@ -1,7 +1,8 @@
 import { client } from "@/config/client";
 import { poolManagerConfig, swapConfig } from "@/config/contracts";
-import { InQuoteInfo, MAX_SQRT_PRICE, MIN_SQRT_PRICE, OutQuoteInfo, PairInfo, SwapStatus, RawPoolInfo, TokenInfo } from "./types";
+import { InQuoteInfo, OutQuoteInfo, PairInfo, SwapStatus, RawPoolInfo, TokenInfo } from "./types";
 import { Address, erc20Abi, isAddress, maxUint256, parseUnits } from "viem";
+import { TickMath } from "@uniswap/v3-sdk";
 
 /**
  * 1. 获取所有流动性池信息
@@ -176,7 +177,7 @@ export async function getOutQuote(
 	// --- 关键步骤 2: 确定价格方向 ---
 	// Uniswap V3 数学逻辑：根据地址排序决定 sqrtPriceLimitX96 是向上还是向下寻找
 	const isLower: boolean = fromToken.address.toLowerCase() < toToken.address.toLowerCase();
-	const limit: bigint = isLower ? MIN_SQRT_PRICE + 1n : MAX_SQRT_PRICE - 1n;
+	const limit: bigint = isLower ? BigInt(TickMath.MIN_SQRT_RATIO.toString()) + 1n : BigInt(TickMath.MAX_SQRT_RATIO.toString()) - 1n;
 	
 	// --- 关键步骤 3: 找池子 ---
 	const candidatePools: RawPoolInfo[] = getCandidatePools(pools, fromToken, toToken);
@@ -260,7 +261,7 @@ export async function getInQuote(
 	
 	// 确定价格方向限制
 	const isLower: boolean = fromToken.address.toLowerCase() < toToken.address.toLowerCase();
-	const limit: bigint = isLower ? MIN_SQRT_PRICE + 1n : MAX_SQRT_PRICE - 1n;
+	const limit: bigint = isLower ? BigInt(TickMath.MIN_SQRT_RATIO.toString()) + 1n : BigInt(TickMath.MAX_SQRT_RATIO.toString()) - 1n;
 	
 	// 找池子
 	const candidatePools: RawPoolInfo[] = getCandidatePools(pools, fromToken, toToken);

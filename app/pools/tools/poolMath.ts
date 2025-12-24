@@ -1,6 +1,7 @@
 import { FormattedPoolInfo, RawPoolInfo, TokenInfo } from "@/app/tools/types";
 import { client } from "@/config/client";
 import { poolManagerConfig } from "@/config/contracts";
+import { TICK_SPACINGS } from "@uniswap/v3-sdk";
 import { Address, erc20Abi, isAddress, stringify } from "viem";
 
 export async function formatPoolInfos(): Promise<FormattedPoolInfo[]> {
@@ -80,8 +81,10 @@ export async function formatPoolInfos(): Promise<FormattedPoolInfo[]> {
 		}
 	}
 
-	// 4. 组装数据
-	const formattedPoolInfos: FormattedPoolInfo[] = rawPools.filter((rawPool)=> rawPool.fee > 100 && rawPool.fee < 100000).map((rawPool: RawPoolInfo) => {
+	const supportFees: number[] = Object.keys(TICK_SPACINGS).map(Number);
+	const formattedPoolInfos: FormattedPoolInfo[] = rawPools.filter((rawPool)=> {
+		return supportFees.includes(rawPool.fee);
+	}).map((rawPool: RawPoolInfo) => {
 		const info0 = tokenMap.get(rawPool.token0);
 		const info1 = tokenMap.get(rawPool.token1);
 		const token0Symbol = info0?.symbol || "UNKNOWN";

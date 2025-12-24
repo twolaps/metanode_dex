@@ -18,15 +18,6 @@ export const DepositFeeGroup = ({ feeTier }: DepositFeeGroupProps) => {
 		'border'
 	);
 
-	let extraFeeItems: JSX.Element | null = null;
-	if (feeTier > 0 && [500, 3000, 10000].indexOf(feeTier) === -1) {
-		extraFeeItems = (
-			<ToggleGroupItem value={`${feeTier}`} className={toggleItemClass}>
-				{(feeTier / 10000).toFixed(2)}%
-			</ToggleGroupItem>
-		);
-	}
-
 	return (
 		<div>
 			<div>
@@ -43,7 +34,6 @@ export const DepositFeeGroup = ({ feeTier }: DepositFeeGroupProps) => {
 				<ToggleGroupItem value="10000" className={toggleItemClass}>
 					1%
 				</ToggleGroupItem>
-				{extraFeeItems}
 			</ToggleGroup>
 			<Separator />
 		</div>
