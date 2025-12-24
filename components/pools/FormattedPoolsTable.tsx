@@ -15,8 +15,8 @@ export const FormattedPoolsTable = ({ formattedPoolInfos, onClickDeposit }: Form
 			<TableRow key={poolInfo.pool}>
 				<TableCell className="text-lg text-[#99A1AF] text-center w-[0px]">
 					{poolInfo.tokenInfo0.symbol}/{poolInfo.tokenInfo1.symbol}
-					<h1>{poolInfo.tokenInfo0.address}</h1>
-					<h1>{poolInfo.tokenInfo1.address}</h1>
+					{/* <h1>{poolInfo.tokenInfo0.address}</h1>
+					<h1>{poolInfo.tokenInfo1.address}</h1> */}
 				</TableCell>
 				<TableCell className="text-lg text-[#99A1AF] text-right w-[150px]">{poolInfo.fee}</TableCell>
 				<TableCell className="text-lg text-[#99A1AF] text-right w-[150px]">{poolInfo.range}</TableCell>

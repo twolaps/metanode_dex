@@ -63,7 +63,7 @@ export async function formatPoolInfos(): Promise<FormattedPoolInfo[]> {
 
 			// 回填结果
 			result.forEach((res, index) => {
-				const address = contracts[Math.floor(index / 2)].address;
+				const address = contracts[index].address;
 				const info = tokenMap.get(address);
 				if (info && res.status === 'success') {
 					if (index % 2 === 0) {

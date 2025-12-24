@@ -53,7 +53,7 @@ export const DepositAmountView = ({ formattedPoolInfo }: DepositAmountViewProps)
 					<h1 className="mt-2 mb-2">{formattedPoolInfo?.tokenInfo1.symbol}</h1>
 					<Input type="number" placeholder="0.0" className="border-0 outline-0 focus:ring-0 w-52 mb-4" />
 					<h1 className="mb-4">
-						余额：{0.0}
+						余额：{formatBigIntAmount(balance1?.value || BigInt(0), formattedPoolInfo?.tokenInfo1.decimals || 18)}
 					</h1>
 				</div>
 
