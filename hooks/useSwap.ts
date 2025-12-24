@@ -1,5 +1,6 @@
-import { MAX_SQRT_PRICE, MIN_SQRT_PRICE, TokenInfo, TradeDirection } from "@/app/tools/types";
+import { TokenInfo, TradeDirection } from "@/app/tools/types";
 import { swapConfig } from "@/config/contracts";
+import { TickMath } from "@uniswap/v3-sdk";
 import { Address, maxUint256, parseUnits } from "viem";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
@@ -38,8 +39,8 @@ export const useSwap = () => {
 		const amountOutBI = parseUnits(amountOut, toToken.decimals);
 
 		const sqrtPriceLimitX96: bigint = fromToken.address.toLowerCase() < toToken.address.toLowerCase()
-				? MIN_SQRT_PRICE + 1n
-				: MAX_SQRT_PRICE - 1n;
+				? BigInt(TickMath.MIN_SQRT_RATIO.toString()) + 1n
+				: BigInt(TickMath.MAX_SQRT_RATIO.toString()) - 1n;
 
 		//调用合约
 		if (isExactInput) {

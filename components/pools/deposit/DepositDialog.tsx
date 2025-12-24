@@ -5,6 +5,7 @@ import { DepositFeeGroup } from "./DepositFeeGroup";
 import { DepositPriceRange } from "./DepositPriceRange";
 import { DepositTokenView } from "./DepositTokenView";
 import { DepositAmountView } from "./DepositAmountView";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 interface DepositDialogProps {
 	open: boolean;
@@ -21,6 +22,8 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo }: DepositDialo
 					<DialogTitle className="text-2xl font-bold">
 						{`存入 ${formattedPoolInfo?.tokenInfo0.symbol}/${formattedPoolInfo?.tokenInfo1.symbol}(${formattedPoolInfo?.fee})`}
 					</DialogTitle>
+					<DialogDescription className="sr-only">
+					</DialogDescription>
 					<Separator />
 				</DialogHeader>
 
