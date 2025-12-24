@@ -151,25 +151,22 @@ export const calculateAmountsFrom0 = (
   const pool = new Pool(
     token0,
     token1,
-    poolInfo.rawPoolInfo.fee,
+    Number(poolInfo.rawPoolInfo.fee),
     poolInfo.rawPoolInfo.sqrtPriceX96.toString(),
     poolInfo.rawPoolInfo.liquidity.toString(),
-    poolInfo.rawPoolInfo.tick
+    Number(poolInfo.rawPoolInfo.tick)
   );
 
   // 3. 使用 Position.fromAmounts 自动计算
   // 这个方法会根据当前价格、区间和输入的 amount0，自动推导出最大可用的 liquidity 和对应的 amount1
   const position = Position.fromAmounts({
     pool: pool,
-    tickLower: poolInfo.rawPoolInfo.tickLower,
-    tickUpper: poolInfo.rawPoolInfo.tickUpper,
+    tickLower: Number(poolInfo.rawPoolInfo.tickLower),
+    tickUpper: Number(poolInfo.rawPoolInfo.tickUpper),
     amount0: amount0.toString(),
     amount1: maxUint256.toString(), // 给一个无限大的 amount1 允许它自由配对
     useFullPrecision: true,
   });
-
-	const a: JSBI = JSBI.BigInt("0");
-	console.log(a);
 
   const calcAmount0 = BigInt(position.amount0.quotient.toString());
   const calcAmount1 = BigInt(position.amount1.quotient.toString());
