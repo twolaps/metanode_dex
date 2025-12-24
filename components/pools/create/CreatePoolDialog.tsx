@@ -1,19 +1,18 @@
 import { TokenInfo } from "@/app/tools/types";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Separator } from "../ui/separator";
-import { AddLiquidityToken } from "./AddLiquidityToken";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../ui/dialog";
+import { Separator } from "../../ui/separator";
+import { AddLiquidityToken } from "../AddLiquidityToken";
 import { useState } from "react";
-import { FeeGroup } from "./FeeGroup";
-import { SetPriceRange } from "./SetPriceRange";
-import { PriceRangePlaceholder } from "./PriceRangePlaceholder";
+import { CreateFeeGroup } from "./CreateFeeGroup";
+import { SetPriceRange } from "../SetPriceRange";
+import { PriceRangePlaceholder } from "../PriceRangePlaceholder";
 
-interface AddLiquidityDialogProps {
+interface CreatePoolDialogProps {
 	open: boolean;
 	onClose: () => void;
 }
 
-export const AddLiquidityDialog = ({ open, onClose }: AddLiquidityDialogProps) => {
-
+export const CreatePoolDialog = ({ open, onClose }: CreatePoolDialogProps) => {
 	const [token0, setToken0] = useState<TokenInfo | null>(null);
 	const [token1, setToken1] = useState<TokenInfo | null>(null);
 	const [feeTier, setFeeTier] = useState<string>("500");
@@ -43,7 +42,7 @@ export const AddLiquidityDialog = ({ open, onClose }: AddLiquidityDialogProps) =
 				
 
 				<Separator />
-				<FeeGroup feeTier={feeTier} setFeeTier={setFeeTier} />
+				<CreateFeeGroup feeTier={feeTier} setFeeTier={setFeeTier} />
 				{!!token0 && !!token1 ? 
 				<SetPriceRange token0={token0} token1={token1} /> : 
 				<PriceRangePlaceholder />}

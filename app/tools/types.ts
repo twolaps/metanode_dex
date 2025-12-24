@@ -15,15 +15,14 @@ export interface RawPoolInfo {
 }
 
 export interface FormattedPoolInfo {
-  pool: Address;         
-  token0: string;        
-  token1: string;
-	decimals0: number;
-	decimals1: number;
+  pool: Address;
+	tokenInfo0: TokenInfo;        
+	tokenInfo1: TokenInfo;
 	fee: string;
 	range: string;
 	price: string;
 	liquidity: string;
+	rawPoolInfo: RawPoolInfo;
 }
 
 export interface TokenInfo {

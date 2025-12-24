@@ -81,7 +81,7 @@ export async function formatPoolInfos(): Promise<FormattedPoolInfo[]> {
 	}
 
 	// 4. 组装数据
-	const formattedPoolInfos: FormattedPoolInfo[] = rawPools.map((rawPool: RawPoolInfo) => {
+	const formattedPoolInfos: FormattedPoolInfo[] = rawPools.filter((rawPool)=> rawPool.fee > 100 && rawPool.fee < 100000).map((rawPool: RawPoolInfo) => {
 		const info0 = tokenMap.get(rawPool.token0);
 		const info1 = tokenMap.get(rawPool.token1);
 		const token0Symbol = info0?.symbol || "UNKNOWN";
@@ -108,14 +108,13 @@ export async function formatPoolInfos(): Promise<FormattedPoolInfo[]> {
 
 		const formattedPool: FormattedPoolInfo = {
 			pool: rawPool.pool,
-			token0: token0Symbol,
-			token1: token1Symbol,
-			decimals0,
-			decimals1,
+			tokenInfo0: {address: rawPool.token0, symbol: token0Symbol, decimals: decimals0},
+			tokenInfo1: {address: rawPool.token1, symbol: token1Symbol, decimals: decimals1},
 			fee: `${parseFloat((rawPool.fee / 10000).toFixed(2))}%`,
 			range,
 			price,
 			liquidity: formatter.format(Number(rawPool.liquidity)),
+			rawPoolInfo: rawPool,
 		};
 
 		return formattedPool;
@@ -124,7 +123,7 @@ export async function formatPoolInfos(): Promise<FormattedPoolInfo[]> {
 	return formattedPoolInfos;
 }
 
-function formatPrice(p: number): string {
+export function formatPrice(p: number): string {
 	if (p === 0) return "0";
 	return (p < 0.001 || p > 1e6) ? p.toExponential(2) : p.toFixed(4);
 }

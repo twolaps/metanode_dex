@@ -5,19 +5,25 @@ import { Button } from "../ui/button";
 
 interface FormattedPoolsTableProps {
 	formattedPoolInfos: FormattedPoolInfo[];
+	onClickDeposit: (targetPool: FormattedPoolInfo) => void;
 }
 
-export const FormattedPoolsTable = ({ formattedPoolInfos }: FormattedPoolsTableProps) => {
-	const tableCells: JSX.Element[] = formattedPoolInfos.map((poolInfo) => {
+export const FormattedPoolsTable = ({ formattedPoolInfos, onClickDeposit }: FormattedPoolsTableProps) => {
+
+		const tableCells: JSX.Element[] = formattedPoolInfos.map((poolInfo) => {
 		const tableCell: JSX.Element = (
 			<TableRow key={poolInfo.pool}>
-				<TableCell className="text-lg text-[#99A1AF] text-center w-[0px]">{poolInfo.token0}/{poolInfo.token1}</TableCell>
+				<TableCell className="text-lg text-[#99A1AF] text-center w-[0px]">
+					{poolInfo.tokenInfo0.symbol}/{poolInfo.tokenInfo1.symbol}
+					<h1>{poolInfo.tokenInfo0.address}</h1>
+					<h1>{poolInfo.tokenInfo1.address}</h1>
+				</TableCell>
 				<TableCell className="text-lg text-[#99A1AF] text-right w-[150px]">{poolInfo.fee}</TableCell>
 				<TableCell className="text-lg text-[#99A1AF] text-right w-[150px]">{poolInfo.range}</TableCell>
-				<TableCell className="text-lg text-[#99A1AF] text-right w-[150px]">{poolInfo.price} {poolInfo.token1}</TableCell>
+				<TableCell className="text-lg text-[#99A1AF] text-right w-[150px]">{poolInfo.price} {poolInfo.tokenInfo1.symbol}</TableCell>
 				<TableCell className="text-lg text-[#99A1AF] text-right w-[150px]">{poolInfo.liquidity}</TableCell>
 				<TableCell className="text-center">
-					<Button>存入</Button>
+					<Button onClick={()=>{onClickDeposit(poolInfo)}}>存入</Button>
 				</TableCell>
 			</TableRow>)
 			return tableCell;

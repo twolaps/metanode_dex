@@ -15,23 +15,23 @@ export const AddLiquidityToken = ({ index, onSelectToken }: AddLiquidityTokenPro
 	const [open, setOpen] = useState(false);
 	const [selectedToken, setSelectedToken] = useState<TokenInfo | null>(null);
 
-	const commandItems: JSX.Element[] = SUPPORTED_TOKENS.map((tokenInfo: TokenInfo)=>{
-			return (<CommandItem 
-				key={tokenInfo.symbol}
-				className="aria-selected:bg-primary!"
-				value={tokenInfo.symbol}
-				onSelect={()=>{
-					console.log("Selected token:", tokenInfo);
-					setOpen(false);
-					setSelectedToken(tokenInfo);
-					onSelectToken(tokenInfo);
-				}}>
-					<div className="flex justify-between w-full">
-						<h1>{tokenInfo.symbol}</h1>
-						<h1>({shortenAddress(tokenInfo.address)})</h1>
-					</div>
-					
-			</CommandItem>);
+	const	commandItems: JSX.Element[] = SUPPORTED_TOKENS.map((tokenInfo: TokenInfo)=>{
+		return (<CommandItem 
+			key={tokenInfo.symbol}
+			className="aria-selected:bg-primary!"
+			value={tokenInfo.symbol}
+			onSelect={()=>{
+				console.log("Selected token:", tokenInfo);
+				setOpen(false);
+				setSelectedToken(tokenInfo);
+				onSelectToken(tokenInfo);
+			}}>
+				<div className="flex justify-between w-full">
+					<h1>{tokenInfo.symbol}</h1>
+					<h1>({shortenAddress(tokenInfo.address)})</h1>
+				</div>
+				
+		</CommandItem>);
 	});
 
 	return (

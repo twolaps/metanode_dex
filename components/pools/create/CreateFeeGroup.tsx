@@ -1,13 +1,13 @@
 import { cn } from "@/lib/utils";
-import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group"
-import { Separator } from "../ui/separator";
+import { ToggleGroup, ToggleGroupItem } from "../../ui/toggle-group"
+import { Separator } from "../../ui/separator";
 
-interface FeeGroupProps {
+interface CreateFeeGroupProps {
 	feeTier: string;
 	setFeeTier: (value: string) => void;
 }
 
-export const FeeGroup = ({ feeTier, setFeeTier }: FeeGroupProps) => {
+export const CreateFeeGroup = ({ feeTier, setFeeTier }: CreateFeeGroupProps) => {
 	const onValueChange = (value: string) => {
 		console.log("Selected fee tier:", value);
 		if (value?.length > 0) {

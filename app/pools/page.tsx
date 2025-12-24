@@ -3,16 +3,24 @@ import { formatPoolInfos } from "./tools/poolMath";
 import { useEffect, useState } from "react";
 import { FormattedPoolInfo } from "../tools/types";
 import { Button } from "@/components/ui/button";
-import { AddLiquidityDialog } from "@/components/pools/AddLiquidityDialog";
 import { FormattedPoolsTable } from "@/components/pools/FormattedPoolsTable";
+import { CreatePoolDialog } from "@/components/pools/create/CreatePoolDialog";
+import { DepositDialog } from "@/components/pools/deposit/DepositDialog";
 
 export default function PoolsPage() {
 	const [formattedPoolInfos, setFormattedPoolInfos] = useState<FormattedPoolInfo[]>([]);
-	const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState<boolean>(false);
+	const [isDepositDialogOpen, setIsDepositDialogOpen] = useState<boolean>(false);
+	const [targetPool, setTargetPool] = useState<FormattedPoolInfo | null>(null);
 
 	const onClickAddLiquidity = () => {
 		console.log("Add Liquidity button clicked");
-		setIsDialogOpen(true);
+		setIsCreateDialogOpen(true);
+	}
+
+	const onClickDeposit = (targetPool: FormattedPoolInfo) => {
+		setTargetPool(targetPool);
+		setIsDepositDialogOpen(true);
 	}
 
 	useEffect(() => {
@@ -31,8 +39,9 @@ export default function PoolsPage() {
 				<Button className="mt-4 mb-4 ml-auto mr-0" onClick={onClickAddLiquidity}>创建/添加流动性</Button>
 			</div>
 			
-			<FormattedPoolsTable formattedPoolInfos={formattedPoolInfos} />
-			<AddLiquidityDialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} />
+			<FormattedPoolsTable formattedPoolInfos={formattedPoolInfos} onClickDeposit={onClickDeposit} />
+			<CreatePoolDialog open={isCreateDialogOpen} onClose={() => setIsCreateDialogOpen(false)} />
+			<DepositDialog open={isDepositDialogOpen} onClose={() => setIsDepositDialogOpen(false)} formattedPoolInfo={targetPool!} />
 		</div>
 	);
 }
