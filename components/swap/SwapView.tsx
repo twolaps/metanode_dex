@@ -14,6 +14,7 @@ import { useSwap } from "@/hooks/useSwap";
 import { SettingButton } from "./SettingButton";
 import { SlippageSetting } from "./SlippageSetting";
 import { cn } from "@/lib/utils";
+import { swapConfig } from "@/config/contracts";
 
 /**
  * 核心组件：SwapView
@@ -273,7 +274,7 @@ export default function SwapView() {
 	console.log("userAddress:", userAddress);
 
 
-	const {allowance, needsApprove, refetch: refetchAllowance} = useTokenAllowance(fromToken, amountIn);
+	const {allowance, needsApprove, refetch: refetchAllowance} = useTokenAllowance(fromToken, amountIn, swapConfig.address);
 
 	console.log("Token Allowance:", allowance?.toString(), "Needs Approve:", needsApprove);
 
@@ -281,7 +282,7 @@ export default function SwapView() {
 		approve, 
 		isLoading: isApproving, 
 		isSuccess: isApproveSuccess
-	} = useApprove(fromToken?.address);
+	} = useApprove(fromToken?.address, swapConfig.address);
 
 	const { swap, isSwapping, isSuccess: isSwapSuccess } = useSwap();
 

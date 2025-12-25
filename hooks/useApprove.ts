@@ -1,8 +1,7 @@
-import { swapConfig } from "@/config/contracts";
 import { Address, erc20Abi, maxUint256 } from "viem";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
-export const useApprove = (tokenAddress?: Address) => {
+export const useApprove = (tokenAddress?: Address, spenderAddress?: Address) => {
 	// Your hook logic here
 	const {writeContractAsync, isPending, data: approveHash} = useWriteContract();
 	const {isLoading: isConfirming, isSuccess} = useWaitForTransactionReceipt({
@@ -16,7 +15,7 @@ export const useApprove = (tokenAddress?: Address) => {
 			address: tokenAddress,
 			abi: erc20Abi,
 			functionName: 'approve',
-			args: [swapConfig.address as Address, maxUint256],
+			args: [spenderAddress as Address, maxUint256],
 		});
 
 		return txHash;	

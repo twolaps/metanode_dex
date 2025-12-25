@@ -1,13 +1,12 @@
 import { TokenInfo } from "@/app/tools/types";
-import { swapConfig } from "@/config/contracts";
-import { Console } from "console";
 import { useMemo } from "react";
-import { erc20Abi } from "viem";
+import { Address, erc20Abi } from "viem";
 import { useAccount, useReadContract } from "wagmi";
 
 export const useTokenAllowance = (
 	tokenInfo: TokenInfo | null | undefined,
-	amountIn: string | undefined) => {
+	amountIn: string | undefined,
+	spenderAddress: Address) => {
 		const {address: userAddress} = useAccount();
 
 		// 1. 查数据：跟 amountIn 没关系，只要有币就查
@@ -15,7 +14,7 @@ export const useTokenAllowance = (
 			address: tokenInfo?.address,
         abi: erc20Abi,
         functionName: "allowance",
-        args: [userAddress!, swapConfig.address],
+        args: [userAddress!, spenderAddress!],
         query: {
             // 只要选了币、连了钱包，就开始静默查询
             enabled: !!tokenInfo?.address && !!userAddress, 
