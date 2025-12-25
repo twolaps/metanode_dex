@@ -1,4 +1,5 @@
 import { positionConfig } from "@/config/contracts";
+import { useEffect, useState } from "react";
 import { Address, parseUnits } from "viem";
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
@@ -15,9 +16,11 @@ interface DepositParams {
 export const useDeposit = () => {
 	const {address: userAddress} = useAccount();
 	const {writeContractAsync, isPending, data: depositHash} = useWriteContract();
-	const {isLoading: isConfirming, isSuccess:isDepositSuccess} = useWaitForTransactionReceipt({
+	const {isLoading: isConfirming, isSuccess: wagamiSuccess} = useWaitForTransactionReceipt({
 		hash: depositHash
 	});
+
+	const [customSuccess, setCustomSuccess] = useState<boolean>(false);
 
 	const deposit = async ({
 		token0,
@@ -52,9 +55,16 @@ export const useDeposit = () => {
 		});	
 	}
 
+	useEffect(() => {
+		if (wagamiSuccess) {
+			setCustomSuccess(true);
+		}
+	}, [wagamiSuccess]);
+
 	return {
 		deposit,
 		isLoading: isPending || isConfirming,
-		isSuccess: isDepositSuccess,
+		isSuccess: customSuccess,
+		setIsSuccess: setCustomSuccess,
 	};
 };
