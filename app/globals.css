@@ -7,7 +7,7 @@
 
 	/* --- 字体配置 --- */
   /* 直接填入您的字体列表，确保 v4 能生成正确的类名 */
-  --font-sans: "Inter", "-apple-system", "BlinkMacSystemFont", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-sans: "Inter", system-ui, "-apple-system", "BlinkMacSystemFont", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   --font-mono: "Consolas", "Monaco", "monospace";
 
   /* --- 阴影与颜色扩展 (解决失效问题) --- */
