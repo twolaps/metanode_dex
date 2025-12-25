@@ -11,6 +11,8 @@ import { useTokenAllowance } from "@/hooks/useTokenAllowance";
 import { positionConfig } from "@/config/contracts";
 import { useApprove } from "@/hooks/useApprove";
 import { Button } from "@/components/ui/button";
+import { useDeposit } from "@/hooks/useDeposit";
+import { toast } from "sonner";
 
 interface DepositDialogProps {
 	open: boolean;
@@ -43,6 +45,8 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo }: DepositDialo
 		formattedPoolInfo?.tokenInfo1.address,
 		positionConfig.address);
 
+	const {deposit, isLoading: isDepositing, isSuccess: isDepositSuccess} = useDeposit();	
+
 	const onClickApprove = async () => {
 		if (needsApprove0) {
 			await approve0();
@@ -54,10 +58,42 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo }: DepositDialo
 		}
 	}
 
-	const onClickDeposit = () => {
+	const onClickDeposit = async() => {
 		//to deposit logic
 		onClose();
+		await deposit({
+			token0: formattedPoolInfo.rawPoolInfo.token0,
+			token1: formattedPoolInfo.rawPoolInfo.token1,
+			index: formattedPoolInfo.rawPoolInfo.index,
+			amount0,
+			amount1,
+			decimals0: formattedPoolInfo.tokenInfo0.decimals,
+			decimals1: formattedPoolInfo.tokenInfo1.decimals,
+		});
+		setAmount0('');
+		setAmount1('');
+		toast.success('存入交易已提交，等待上链确认。');
 	}
+	
+
+	useEffect(() => {
+		if (isDepositSuccess) {
+			toast.success('存入成功！');
+			onClose();
+		}
+		//eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isDepositSuccess]);
+
+	useEffect(() => {
+		if (isApproveSuccess0) {
+			refetchAllowance0();
+		}
+
+		if (isApproveSuccess1) {
+			refetchAllowance1();
+		}
+		//eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isApproveSuccess0, isApproveSuccess1]);
 
 	const renderActionButton = (): JSX.Element => {
 		let button: JSX.Element;
@@ -91,17 +127,6 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo }: DepositDialo
 		
 		return button;
 	}
-
-	useEffect(() => {
-		if (isApproveSuccess0) {
-			refetchAllowance0();
-		}
-
-		if (isApproveSuccess1) {
-			refetchAllowance1();
-		}
-		//eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isApproveSuccess0, isApproveSuccess1]);
 
 	return (
 		<Dialog open={open} onOpenChange={onClose}>
