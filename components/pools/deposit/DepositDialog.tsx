@@ -6,7 +6,7 @@ import { DepositPriceRange } from "./DepositPriceRange";
 import { DepositTokenView } from "./DepositTokenView";
 import { DepositAmountView } from "./DepositAmountView";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import { JSX, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { useTokenAllowance } from "@/hooks/useTokenAllowance";
 import { positionConfig } from "@/config/contracts";
 import { useApprove } from "@/hooks/useApprove";
@@ -22,6 +22,8 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo }: DepositDialo
 
 	const [amount0, setAmount0] = useState<string>('');
 	const [amount1, setAmount1] = useState<string>('');
+
+	const [direction, setDirection] = useState<'0to1' | '1to0'>('0to1');
 
 	const {needsApprove: needsApprove0, refetch: refetchAllowance0} = useTokenAllowance(
 		formattedPoolInfo?.tokenInfo0,
@@ -41,6 +43,23 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo }: DepositDialo
 		formattedPoolInfo?.tokenInfo1.address,
 		positionConfig.address);
 
+	const onClickApprove = async () => {
+		if (needsApprove0) {
+			await approve0();
+			refetchAllowance0();
+		}
+
+		if (needsApprove1) {
+			await approve1();
+			refetchAllowance1();
+		}
+	}
+
+	const onClickDeposit = () => {
+		//to deposit logic
+		onClose();
+	}
+
 	const renderActionButton = (): JSX.Element => {
 		let button: JSX.Element;
 
@@ -54,23 +73,36 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo }: DepositDialo
 		else if (needsApprove0 || needsApprove1) {
 			button = (
 				<Button 
-					disabled={isApproving0} 
-					onClick={async () => {
-						await approve0();
-						refetchAllowance0();
-					}} 
-					className="w-full h-12 mt-3 mb-3 bg-blue-600 text-white rounded-lg">
-					{isApproving0 ? '批准中...' : '批准 ' + formattedPoolInfo?.tokenInfo0.symbol}
+					disabled={isApproving0 || isApproving1} 
+					onClick={onClickApprove} 
+					className="w-full h-12 mt-3 mb-3 text-lg rounded-lg shadow-glow">
+					{isApproving0 ? '批准中...' : '批 准 '}
 				</Button>
 			)
 		}
 		else {
-			return <></>
+			button = (
+				<Button 
+					onClick={onClickDeposit} 
+					className="w-full h-12 mt-3 mb-3 text-lg rounded-lg shadow-glow">
+					确 认 存 入
+				</Button>
+			)	
 		}
 		
 		return button;
-
 	}
+
+	useEffect(() => {
+		if (isApproveSuccess0) {
+			refetchAllowance0();
+		}
+
+		if (isApproveSuccess1) {
+			refetchAllowance1();
+		}
+		//eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isApproveSuccess0, isApproveSuccess1]);
 
 	return (
 		<Dialog open={open} onOpenChange={onClose}>

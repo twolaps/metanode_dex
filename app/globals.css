@@ -4,10 +4,20 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+
+	/* --- 字体配置 --- */
+  /* 直接填入您的字体列表，确保 v4 能生成正确的类名 */
+  --font-sans: "Inter", "-apple-system", "BlinkMacSystemFont", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-mono: "Consolas", "Monaco", "monospace";
+
+  /* --- 阴影与颜色扩展 (解决失效问题) --- */
+  /* 定义您的紫色发光变量，对应 shadow-glow 类名 */
+  --shadow-glow: 0 0 25px rgba(110, 99, 242, 1);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono); */
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -136,3 +146,4 @@
     -moz-appearance: textfield;
   }
 }
+

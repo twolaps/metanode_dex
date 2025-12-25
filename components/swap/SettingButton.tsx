@@ -15,8 +15,8 @@ export const SettingButton = ({onClick}: SettingButtonProps) => {
 	}
 
 	return (
-		<Button className="mt-4 ml-auto" onClick={onClickButton}>
-			<Settings className="h-6! w-6!" />
+		<Button className="mt-4 ml-auto shadow-glow" onClick={onClickButton}>
+			<Settings className="!h-6 !w-6" />
 		</Button>
 	)
 }

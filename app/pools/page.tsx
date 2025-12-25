@@ -36,7 +36,7 @@ export default function PoolsPage() {
 	return (
 		<div className="flex flex-col items-center">
 			<div className="w-[1200px] flex items-end">
-				<Button className="mt-4 mb-4 ml-auto mr-0" onClick={onClickAddLiquidity}>创建/添加流动性</Button>
+				<Button className="mt-4 mb-4 ml-auto mr-0 shadow-glow" onClick={onClickAddLiquidity}>创建/添加流动性</Button>
 			</div>
 			
 			<FormattedPoolsTable formattedPoolInfos={formattedPoolInfos} onClickDeposit={onClickDeposit} />

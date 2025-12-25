@@ -22,6 +22,7 @@ export const SwapButton = ({ buttonConfig, onClick }: SwapButtonProps) => {
 			rounded-[16px]
 			text-2xl
 			mt-6
+			shadow-glow
 			
 			${buttonConfig.disabled ? 'opacity-50 cursor-not-allowed' : ''} // 增加视觉反馈
 		`}

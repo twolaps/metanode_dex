@@ -6,6 +6,7 @@ import { TokenInfo } from "@/app/tools/types";
 import { Address } from "viem";
 import { JSX, useState } from "react";
 import { shortenAddress } from "@/utils/format";
+import { cn } from "@/lib/utils";
 
 interface SelectTokenBoxProps {
 	selectableTokensMap: Map<Address, TokenInfo>;
@@ -17,14 +18,15 @@ interface SelectTokenBoxProps {
 export const SelectTokenBox = ({ selectableTokensMap, onTokenSelect, selectedToken, setToken }: SelectTokenBoxProps) => {
 	const [open, setOpen] = useState(false);
 
-	const btnClass: string = [
+	const btnClass: string = cn(
 		'mt-4',
 		'w-[120px]',
 		'h-10',
 		'rounded-[8px]',
 		'absolute',
 		'right-2',
-	].join(' ');
+		'shadow-glow'
+	);
 
 	const tokensArray: TokenInfo[] = Array.from(selectableTokensMap.values());
 	tokensArray.sort((a, b) => a.symbol.localeCompare(b.symbol));

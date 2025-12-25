@@ -23,7 +23,7 @@ export const FormattedPoolsTable = ({ formattedPoolInfos, onClickDeposit }: Form
 				<TableCell className="text-lg text-[#99A1AF] text-right w-[150px]">{poolInfo.price} {poolInfo.tokenInfo1.symbol}</TableCell>
 				<TableCell className="text-lg text-[#99A1AF] text-right w-[150px]">{poolInfo.liquidity}</TableCell>
 				<TableCell className="text-center">
-					<Button className="!shadow-glow" onClick={()=>{onClickDeposit(poolInfo)}}>存入</Button>
+					<Button className="shadow-glow" onClick={()=>{onClickDeposit(poolInfo)}}>存入</Button>
 				</TableCell>
 			</TableRow>)
 			return tableCell;
