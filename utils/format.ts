@@ -8,5 +8,11 @@ export function shortenAddress(address: Address, chars = 4): string {
 }
 
 export function formatBigIntAmount(amountBigInt: bigint, decimals: number = 18, precision: number = 6): string {
-	return Number(formatUnits(amountBigInt, decimals)).toFixed(precision);
+
+	const format: Intl.NumberFormat = new Intl.NumberFormat('en-US', {
+		minimumFractionDigits: 0,
+		maximumFractionDigits: precision,
+		useGrouping: false,
+	});
+	return format.format(Number(formatUnits(amountBigInt, decimals)));
 }

@@ -151,18 +151,18 @@ export const calculateAmountsFrom0 = (
   const pool = new Pool(
     token0,
     token1,
-    Number(poolInfo.rawPoolInfo.fee),
+    poolInfo.rawPoolInfo.fee,
     poolInfo.rawPoolInfo.sqrtPriceX96.toString(),
     poolInfo.rawPoolInfo.liquidity.toString(),
-    Number(poolInfo.rawPoolInfo.tick)
+    poolInfo.rawPoolInfo.tick
   );
 
   // 3. 使用 Position.fromAmounts 自动计算
   // 这个方法会根据当前价格、区间和输入的 amount0，自动推导出最大可用的 liquidity 和对应的 amount1
   const position = Position.fromAmounts({
     pool: pool,
-    tickLower: Number(poolInfo.rawPoolInfo.tickLower),
-    tickUpper: Number(poolInfo.rawPoolInfo.tickUpper),
+    tickLower: poolInfo.rawPoolInfo.tickLower,
+    tickUpper: poolInfo.rawPoolInfo.tickUpper,
     amount0: amount0.toString(),
     amount1: maxUint256.toString(), // 给一个无限大的 amount1 允许它自由配对
     useFullPrecision: true,
@@ -174,6 +174,53 @@ export const calculateAmountsFrom0 = (
   // 4. 逻辑处理：如果返回的 amount0 被修正为 0，说明当前价格不接受 Token0
   if (calcAmount0 === 0n && amount0 > 0n) {
       return [0n, calcAmount1, "当前价格高于区间，请通过输入代币B来添加"];
+  }
+
+  return [calcAmount0, calcAmount1, ""];
+};
+
+
+/**
+ * 利用 SDK 的 Position 类计算配对量
+ */
+export const calculateAmountsFrom1 = (
+  amount1: bigint,
+  poolInfo: FormattedPoolInfo, // 包含 tokenInfo0, tokenInfo1, rawPoolInfo 等
+	chainID: number,
+): [bigint, bigint, string] => {
+  if (amount1 <= 0n) return [0n, 0n, "请输入大于 0 的金额"];
+
+  // 1. 构建 SDK 所需的 Token 对象
+  const token0 = new Token(chainID, poolInfo.tokenInfo0.address, poolInfo.tokenInfo0.decimals);
+  const token1 = new Token(chainID, poolInfo.tokenInfo1.address, poolInfo.tokenInfo1.decimals);
+
+  // 2. 构建虚拟 Pool 对象
+  const pool = new Pool(
+    token0,
+    token1,
+    poolInfo.rawPoolInfo.fee,
+    poolInfo.rawPoolInfo.sqrtPriceX96.toString(),
+    poolInfo.rawPoolInfo.liquidity.toString(),
+    poolInfo.rawPoolInfo.tick
+  );
+
+  // 3. 使用 Position.fromAmounts 自动计算
+  // 这个方法会根据当前价格、区间和输入的 amount0，自动推导出最大可用的 liquidity 和对应的 amount1
+  const position = Position.fromAmounts({
+    pool: pool,
+    tickLower: poolInfo.rawPoolInfo.tickLower,
+    tickUpper: poolInfo.rawPoolInfo.tickUpper,
+    amount0: maxUint256.toString(),
+    amount1: amount1.toString(), // 给一个无限大的 amount1 允许它自由配对
+    useFullPrecision: true,
+  });
+
+  const calcAmount0 = BigInt(position.amount0.quotient.toString());
+  const calcAmount1 = BigInt(position.amount1.quotient.toString());
+
+  // 4. 逻辑处理：如果返回的 amount1 被修正为 0，说明当前价格不接受 Token1
+  if (calcAmount1 === 0n && amount1 > 0n) {
+      return [0n, calcAmount1, "当前价格低于区间，请通过输入代币A来添加"];
   }
 
   return [calcAmount0, calcAmount1, ""];
