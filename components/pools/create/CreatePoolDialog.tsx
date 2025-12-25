@@ -1,11 +1,12 @@
 import { TokenInfo } from "@/app/tools/types";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
 import { Separator } from "../../ui/separator";
-import { AddLiquidityToken } from "../AddLiquidityToken";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CreateFeeGroup } from "./CreateFeeGroup";
-import { SetPriceRange } from "../SetPriceRange";
-import { PriceRangePlaceholder } from "../PriceRangePlaceholder";
+import { CreateSelectToken } from "./CreateSelectToken";
+import { CreateInitialPrice } from "./CreateInitialPrice";
+import { toast } from "sonner";
+import { CreatePriceRange } from "./CreatePriceRange";
 
 interface CreatePoolDialogProps {
 	open: boolean;
@@ -16,36 +17,57 @@ export const CreatePoolDialog = ({ open, onClose }: CreatePoolDialogProps) => {
 	const [token0, setToken0] = useState<TokenInfo | null>(null);
 	const [token1, setToken1] = useState<TokenInfo | null>(null);
 	const [feeTier, setFeeTier] = useState<string>("500");
+	const [initialPrice, setInitialPrice] = useState<string>("");
+	const [rangeMode, setRangeMode] = useState<string>("full"); // "full" or "concentrated"
 
 	const onSelectToken0 = (token: TokenInfo) => {
 		console.log("Selected token 0:", token);
-		setToken0(token);
+
+		if (token1 && token.address === token1.address) {
+			// 如果选择的 token0 和当前的 token1 相同，交换它们
+			toast.error("请选择不同的代币。");
+		}
+		else {
+			setToken0(token);
+		}
 	}
 
 	const onSelectToken1 = (token: TokenInfo) => {
 		console.log("Selected token 1:", token);
-		setToken1(token);
+		if (token0 && token.address === token0.address) {
+			// 如果选择的 token0 和当前的 token1 相同，交换它们
+			toast.error("请选择不同的代币。");
+		}
+		else {
+			setToken1(token);
+		}
 	}
+
+	useEffect(() => {
+		return () => {
+			// Reset state when dialog is closed
+			console.log("Resetting CreatePoolDialog state");
+			setFeeTier("500");
+			setToken0(null);
+			setToken1(null);
+			setRangeMode("full");
+			setInitialPrice("");
+		};
+	}, [open]);
 
 	return (
 		<Dialog open={open} onOpenChange={onClose}>
 			<DialogContent className="bg-card p-4 rounded-lg">
 				<DialogHeader>
 					<DialogTitle className="text-2xl font-bold">创建新的流动性池</DialogTitle>
+					<DialogDescription className="sr-only"></DialogDescription>
 					<Separator />
 				</DialogHeader>
 
-				<div className="w-full flex justify-between gap-4 mt-4 mb-2">
-					<AddLiquidityToken index={0} onSelectToken={onSelectToken0} />
-					<AddLiquidityToken index={1} onSelectToken={onSelectToken1} />
-				</div>
-				
-
-				<Separator />
+				<CreateSelectToken token0={token0} token1={token1} onSelectToken0={onSelectToken0} onSelectToken1={onSelectToken1} />
 				<CreateFeeGroup feeTier={feeTier} setFeeTier={setFeeTier} />
-				{!!token0 && !!token1 ? 
-				<SetPriceRange token0={token0} token1={token1} /> : 
-				<PriceRangePlaceholder />}
+				<CreateInitialPrice token0={token0} token1={token1} initialPrice={initialPrice} onInitialPriceChange={setInitialPrice} />
+				<CreatePriceRange token0={token0} token1={token1} rangeMode={rangeMode} setRangeMode={setRangeMode} />
 			</DialogContent>
 		</Dialog>
 	);

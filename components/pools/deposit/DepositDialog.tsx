@@ -120,8 +120,8 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo, refetchPools }
 					onClick={onClickApprove} 
 					className="w-full h-12 mt-3 mb-3 text-lg rounded-lg shadow-glow">
 					{isApproving0 ? 
-					`批准代币 ${formattedPoolInfo.tokenInfo0.symbol} 中...` :
-					`批 准 代 币 ${formattedPoolInfo.tokenInfo0.symbol}`}
+					`授权代币 ${formattedPoolInfo.tokenInfo0.symbol} 中...` :
+					`授 权 代 币 ${formattedPoolInfo.tokenInfo0.symbol}`}
 				</Button>
 			)
 		}
@@ -132,8 +132,8 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo, refetchPools }
 					onClick={onClickApprove} 
 					className="w-full h-12 mt-3 mb-3 text-lg rounded-lg shadow-glow">
 					{isApproving1 ? 
-					`批准代币 ${formattedPoolInfo.tokenInfo1.symbol} 中...` :
-					`批 准 代 币 ${formattedPoolInfo.tokenInfo1.symbol}`}
+					`授权代币 ${formattedPoolInfo.tokenInfo1.symbol} 中...` :
+					`授 权 代 币 ${formattedPoolInfo.tokenInfo1.symbol}`}
 				</Button>
 			)
 		}

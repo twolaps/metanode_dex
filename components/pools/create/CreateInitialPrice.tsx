@@ -1,0 +1,51 @@
+import { TokenInfo } from "@/app/tools/types"
+import { Input } from "@/components/ui/input";
+import { JSX } from "react";
+import { NoTokensPlaceholder } from "./NoTokensPlaceholder";
+
+interface CreateInitialPriceProps {
+	token0: TokenInfo | null;
+	token1: TokenInfo | null;
+	initialPrice: string;
+	onInitialPriceChange: (price: string) => void;
+}
+
+export const CreateInitialPrice = ({ token0, token1, initialPrice, onInitialPriceChange }: CreateInitialPriceProps) => {
+	console.log("CreateInitialPrice token0:", token0, "token1:", token1);
+	let pair: TokenInfo[] = [];
+	
+	const sortTokens = (a: TokenInfo, b: TokenInfo): TokenInfo[] => {
+		return a.address.toLowerCase() < b.address.toLowerCase() ? [a, b] : [b, a];
+	}
+
+	if (token0 && token1) {
+		pair = sortTokens(token0, token1);
+	}
+
+
+
+	let initialPriceJE: JSX.Element;
+	if (!token0 || !token1) {
+		initialPriceJE = (
+			<NoTokensPlaceholder />
+		);
+	}
+	else {
+		initialPriceJE = (
+			<div className="mt-3 flex items-center gap-2">
+				<h1 className="w-28">1 {pair[0].symbol} =</h1>
+				<div className="w-full relative">
+					<Input value={initialPrice} type="number" className="pr-15" onChange={(e) => onInitialPriceChange(e.target.value)}></Input>
+					<span className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">{pair[1].symbol}</span>
+				</div>
+			</div>
+		);
+	}
+	
+	return (
+		<div>
+			<h1 className="mb-2">初始价格设置</h1>
+			{initialPriceJE}
+		</div>
+	)
+}

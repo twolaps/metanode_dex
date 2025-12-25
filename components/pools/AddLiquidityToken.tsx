@@ -4,14 +4,15 @@ import { ChevronDown } from "lucide-react";
 import { JSX, useState } from "react";
 import { SUPPORTED_TOKENS, TokenInfo } from "@/app/tools/types";
 import { shortenAddress } from "@/utils/format";
+import { toast } from "sonner";
 
 interface AddLiquidityTokenProps {
 	index: number;
+	anotherToken: TokenInfo | null;
 	onSelectToken: (token: TokenInfo) => void;
 }
 
-export const AddLiquidityToken = ({ index, onSelectToken }: AddLiquidityTokenProps) => {
-
+export const AddLiquidityToken = ({ index, anotherToken, onSelectToken }: AddLiquidityTokenProps) => {
 	const [open, setOpen] = useState(false);
 	const [selectedToken, setSelectedToken] = useState<TokenInfo | null>(null);
 
@@ -23,6 +24,10 @@ export const AddLiquidityToken = ({ index, onSelectToken }: AddLiquidityTokenPro
 			onSelect={()=>{
 				console.log("Selected token:", tokenInfo);
 				setOpen(false);
+				if (anotherToken && tokenInfo.address === anotherToken.address) {
+					toast.error("请选择不同的代币。");
+					return;
+				}
 				setSelectedToken(tokenInfo);
 				onSelectToken(tokenInfo);
 			}}>

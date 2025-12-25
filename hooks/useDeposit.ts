@@ -1,5 +1,4 @@
 import { positionConfig } from "@/config/contracts";
-import { useEffect, useState } from "react";
 import { Address, parseUnits } from "viem";
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
