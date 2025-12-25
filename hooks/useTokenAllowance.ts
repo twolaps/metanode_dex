@@ -1,6 +1,6 @@
 import { TokenInfo } from "@/app/tools/types";
 import { useMemo } from "react";
-import { Address, erc20Abi } from "viem";
+import { Address, erc20Abi, parseUnits } from "viem";
 import { useAccount, useReadContract } from "wagmi";
 
 export const useTokenAllowance = (
@@ -38,9 +38,7 @@ export const useTokenAllowance = (
 
 
 			// 正常情况：比较 allowance 和 amountIn
-			const amountInBigInt = BigInt(Math.floor(Number(amountIn) * 10 ** tokenInfo.decimals));
-			
-
+			const amountInBigInt = parseUnits(amountIn, tokenInfo.decimals);
 
 			return allowance < amountInBigInt;
 		}, [allowance, amountIn, tokenInfo]);

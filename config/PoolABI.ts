@@ -1,4 +1,4 @@
-export const poolManagerABI = [
+export const poolABI = [
 	{
 		"anonymous": false,
 		"inputs": [
