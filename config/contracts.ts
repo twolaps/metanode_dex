@@ -1,7 +1,7 @@
 import { poolABI } from "./PoolABI";
 import { positionABI } from "./PositionABI";
+import { swapABI } from "./SwapABI";
 import { poolContract, positionContract, swapContract } from "./contract_address";
-import { swapABI } from "./swapABI";
 
 export const poolManagerConfig = {
   address: poolContract,
