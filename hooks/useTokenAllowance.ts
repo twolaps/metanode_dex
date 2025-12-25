@@ -32,8 +32,8 @@ export const useTokenAllowance = (
 				return false; // 输入无效时，不需要 approve
 			}
 
-			if (tokenInfo.symbol === "ETH" || tokenInfo.symbol === "WETH") {
-				return false; // ETH/WETH 不需要 approve
+			if (tokenInfo.symbol === "ETH") {
+				return false; // ETH 不需要 approve
 			}
 
 

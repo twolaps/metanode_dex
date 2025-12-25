@@ -48,8 +48,7 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo }: DepositDialo
 			await approve0();
 			refetchAllowance0();
 		}
-
-		if (needsApprove1) {
+		else if (needsApprove1) {
 			await approve1();
 			refetchAllowance1();
 		}
