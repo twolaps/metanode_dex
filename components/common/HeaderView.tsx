@@ -3,10 +3,21 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export const HeaderView = () => {
 	const router = useRouter();
+	const pathName: string = usePathname();
+
+	const getTabValue = (): string => {
+		if (pathName === "/") {
+			return "tab1";
+		} else if (pathName === "/pools") {
+			return "tab2";
+		} else {
+			return "tab3";
+		}
+	}
 
 	const onValueChange = (value: string) => {
 		if (value === "tab1") {
@@ -27,7 +38,7 @@ export const HeaderView = () => {
 		<div className="flex h-25 relative bg-[#171422] text-white items-center">
 
 			<div id="test1" className="absolute flex justify-center w-full h-full items-center">
-				<Tabs defaultValue="tab1" onValueChange={onValueChange}>
+				<Tabs value={getTabValue()} onValueChange={onValueChange}>
 					<TabsList className="w-100 h-12 gap-5 p-1 bg-transparent">
 						<TabsTrigger value="tab1" className={tabTriggerClass}>Swap</TabsTrigger>
 						<TabsTrigger value="tab2" className={tabTriggerClass}>Pools</TabsTrigger>
