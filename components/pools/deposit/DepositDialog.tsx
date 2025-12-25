@@ -17,15 +17,14 @@ import { toast } from "sonner";
 interface DepositDialogProps {
 	open: boolean;
 	onClose: () => void;
-	formattedPoolInfo: FormattedPoolInfo
+	formattedPoolInfo: FormattedPoolInfo,
+	refetchPools: () => void;
 }
 
-export const DepositDialog = ({ open, onClose, formattedPoolInfo }: DepositDialogProps) => {
+export const DepositDialog = ({ open, onClose, formattedPoolInfo, refetchPools }: DepositDialogProps) => {
 
 	const [amount0, setAmount0] = useState<string>('');
 	const [amount1, setAmount1] = useState<string>('');
-
-	const [direction, setDirection] = useState<'0to1' | '1to0'>('0to1');
 
 	const {needsApprove: needsApprove0, refetch: refetchAllowance0} = useTokenAllowance(
 		formattedPoolInfo?.tokenInfo0,
@@ -85,6 +84,7 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo }: DepositDialo
 	useEffect(() => {
 		if (isDepositSuccess) {
 			toast.success('存入成功！');
+			refetchPools();
 			onClose();
 		}
 		//eslint-disable-next-line react-hooks/exhaustive-deps

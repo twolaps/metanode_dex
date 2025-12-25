@@ -4,19 +4,16 @@ import { FormattedPoolInfo } from "@/app/tools/types";
 import { Button } from "../ui/button";
 
 interface FormattedPoolsTableProps {
-	formattedPoolInfos: FormattedPoolInfo[];
+	pools: FormattedPoolInfo[];
 	onClickDeposit: (targetPool: FormattedPoolInfo) => void;
 }
 
-export const FormattedPoolsTable = ({ formattedPoolInfos, onClickDeposit }: FormattedPoolsTableProps) => {
-
-		const tableCells: JSX.Element[] = formattedPoolInfos.map((poolInfo) => {
+export const FormattedPoolsTable = ({ pools, onClickDeposit }: FormattedPoolsTableProps) => {
+		const tableCells: JSX.Element[] = pools.map((poolInfo) => {
 		const tableCell: JSX.Element = (
 			<TableRow key={poolInfo.pool}>
 				<TableCell className="text-lg text-[#99A1AF] text-center w-[0px]">
 					{poolInfo.tokenInfo0.symbol}/{poolInfo.tokenInfo1.symbol}
-					{/* <h1>{poolInfo.tokenInfo0.address}</h1>
-					<h1>{poolInfo.tokenInfo1.address}</h1> */}
 				</TableCell>
 				<TableCell className="text-lg text-[#99A1AF] text-right w-[150px]">{poolInfo.fee}</TableCell>
 				<TableCell className="text-lg text-[#99A1AF] text-right w-[150px]">{poolInfo.range}</TableCell>
@@ -34,7 +31,7 @@ export const FormattedPoolsTable = ({ formattedPoolInfos, onClickDeposit }: Form
 				<Table className="w-[1150px] m-auto mt-10">
 					<TableHeader>
 						<TableRow>
-							<TableHead className="text-[#99A1AF] text-2xl font-bold text-center w-[0px]">交易对</TableHead>
+							<TableHead className="text-[#99A1AF] text-2xl font-bold text-center w-auto">交易对</TableHead>
 							<TableHead className="text-[#99A1AF] text-2xl font-bold text-right w-[150px]">费率</TableHead>
 							<TableHead className="text-[#99A1AF] text-2xl font-bold text-right w-[150px]">价格范围</TableHead>
 							<TableHead className="text-[#99A1AF] text-2xl font-bold text-right w-[150px]">价格</TableHead>
@@ -43,7 +40,13 @@ export const FormattedPoolsTable = ({ formattedPoolInfos, onClickDeposit }: Form
 					</TableHeader>
 
 					<TableBody>
-						{tableCells}
+						{pools?.length > 0 ? tableCells : (
+							<TableRow>
+								<TableCell colSpan={6} className="text-center text-lg text-gray-500">
+									暂无可用池子
+								</TableCell>
+							</TableRow>
+						)}
 					</TableBody>
 				</Table>
 			</div>

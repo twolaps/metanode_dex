@@ -12,7 +12,7 @@ export function formatBigIntAmount(amountBigInt: bigint, decimals: number = 18, 
 	const format: Intl.NumberFormat = new Intl.NumberFormat('en-US', {
 		minimumFractionDigits: 0,
 		maximumFractionDigits: precision,
-		useGrouping: false,
+		useGrouping: true,
 	});
 	return format.format(Number(formatUnits(amountBigInt, decimals)));
 }
