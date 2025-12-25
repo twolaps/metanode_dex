@@ -1,20 +1,26 @@
 import { calculateAmountsFrom0, calculateAmountsFrom1 } from "@/app/pools/tools/poolMath";
 import { FormattedPoolInfo } from "@/app/tools/types";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { positionConfig } from "@/config/contracts";
+import { useApprove } from "@/hooks/useApprove";
+import { useTokenAllowance } from "@/hooks/useTokenAllowance";
 import { cn } from "@/lib/utils";
 import { formatBigIntAmount } from "@/utils/format";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { parseUnits } from "viem";
 import { useAccount, useBalance, useChainId } from "wagmi";
 
 interface DepositAmountViewProps {
 	formattedPoolInfo?: FormattedPoolInfo;
+	amount0: string;
+	setAmount0: (value: string) => void;
+	amount1: string;
+	setAmount1: (value: string) => void;
 }
-export const DepositAmountView = ({ formattedPoolInfo }: DepositAmountViewProps) => {
 
-	const [amount0, setAmount0] = useState<string>('');
-	const [amount1, setAmount1] = useState<string>('');
+export const DepositAmountView = ({ formattedPoolInfo, amount0, setAmount0, amount1, setAmount1 }: DepositAmountViewProps) => {
 
 	const timer0 = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const timer1 = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -129,6 +135,16 @@ export const DepositAmountView = ({ formattedPoolInfo }: DepositAmountViewProps)
 			}
 		}
 	}, []);
+
+	const renderActionButton = () => {
+		if (!amount0 || !amount1 || Number(amount0) <= 0 || Number(amount1) <= 0) {
+			return (
+				<Button disabled className="w-full mt-4">
+					请输入存入金额
+				</Button>
+			)
+		}
+	}
 	
 	const rectClass: string = cn(
 		'border',
@@ -146,7 +162,7 @@ export const DepositAmountView = ({ formattedPoolInfo }: DepositAmountViewProps)
 		<div>
 			<h1>存入金额</h1>
 
-			<div className="flex w-full gap-4 mt-2 mb-2">
+			<div className="flex w-full gap-4 mt-2">
 
 				<div className={rectClass}>
 					<h1 className="mt-2 mb-2">{formattedPoolInfo?.tokenInfo0.symbol}</h1>

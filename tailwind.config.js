@@ -29,10 +29,15 @@ module.exports = {
           'monospace'
         ],
       },
-			color:{
+			colors:{
 				bg: 'var(--background)',
+			},
+			boxShadow: {
+				// 定义名为 'glow' 的变量
+				'glow': '0 0 25px rgba(37,99,235,1)',
 			}
     },
+
   },
   plugins: [],
 	darkMode: 'class',
