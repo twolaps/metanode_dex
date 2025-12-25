@@ -15,12 +15,11 @@ interface DepositParams {
 
 export const useDeposit = () => {
 	const {address: userAddress} = useAccount();
-	const {writeContractAsync, isPending, data: depositHash} = useWriteContract();
+	const {writeContractAsync, isPending, data: depositHash, reset: resetDeposit} = useWriteContract();
 	const {isLoading: isConfirming, isSuccess: wagamiSuccess} = useWaitForTransactionReceipt({
-		hash: depositHash
+		hash: depositHash,
+		confirmations: 2
 	});
-
-	const [customSuccess, setCustomSuccess] = useState<boolean>(false);
 
 	const deposit = async ({
 		token0,
@@ -32,7 +31,7 @@ export const useDeposit = () => {
 		decimals1,
 	}: DepositParams) => {
 		if(!userAddress) return;
-
+		resetDeposit();
 		const amount0Desired: bigint = parseUnits(amount0, decimals0);
 		const amount1Desired: bigint = parseUnits(amount1, decimals1);
 
@@ -55,16 +54,10 @@ export const useDeposit = () => {
 		});	
 	}
 
-	useEffect(() => {
-		if (wagamiSuccess) {
-			setCustomSuccess(true);
-		}
-	}, [wagamiSuccess]);
-
-	return {
+		return {
 		deposit,
 		isLoading: isPending || isConfirming,
-		isSuccess: customSuccess,
-		setIsSuccess: setCustomSuccess,
+		isSuccess: wagamiSuccess,
+		resetDeposit,
 	};
 };

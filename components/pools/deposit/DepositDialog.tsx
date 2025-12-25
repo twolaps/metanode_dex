@@ -44,7 +44,7 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo, refetchPools }
 		formattedPoolInfo?.tokenInfo1.address,
 		positionConfig.address);
 
-	const {deposit, isLoading: isDepositing, isSuccess: isDepositSuccess} = useDeposit();	
+	const {deposit, isLoading: isDepositing, isSuccess: isDepositSuccess, resetDeposit} = useDeposit();	
 
 	const onClickApprove = async () => {
 		if (needsApprove0) {
@@ -83,11 +83,12 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo, refetchPools }
 
 	useEffect(() => {
 		if (isDepositSuccess) {
+			resetDeposit();
 			toast.success('存入成功！');
 			refetchPools();
 			onClose();
 		}
-	}, [isDepositSuccess, refetchPools, onClose]);
+	}, [isDepositSuccess, resetDeposit, refetchPools, onClose]);
 
 	useEffect(() => {
 		if (isApproveSuccess0) {
