@@ -87,15 +87,16 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo, refetchPools }
 			refetchPools();
 			onClose();
 		}
-		//eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isDepositSuccess]);
+	}, [isDepositSuccess, refetchPools, onClose]);
 
 	useEffect(() => {
 		if (isApproveSuccess0) {
+			toast.success(`代币 ${formattedPoolInfo.tokenInfo0.symbol} 批准成功！`);
 			refetchAllowance0();
 		}
 
 		if (isApproveSuccess1) {
+			toast.success(`代币 ${formattedPoolInfo.tokenInfo1.symbol} 批准成功！`);
 			refetchAllowance1();
 		}
 		//eslint-disable-next-line react-hooks/exhaustive-deps
@@ -111,13 +112,27 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo, refetchPools }
 				</Button>
 			);
 		}
-		else if (needsApprove0 || needsApprove1) {
+		else if (needsApprove0) {
 			button = (
 				<Button 
 					disabled={isApproving0 || isApproving1} 
 					onClick={onClickApprove} 
 					className="w-full h-12 mt-3 mb-3 text-lg rounded-lg shadow-glow">
-					{isApproving0 ? '批准中...' : '批 准 '}
+					{isApproving0 ? 
+					`批准代币 ${formattedPoolInfo.tokenInfo0.symbol} 中...` :
+					`批 准 代 币 ${formattedPoolInfo.tokenInfo0.symbol}`}
+				</Button>
+			)
+		}
+		else if (needsApprove1) {
+			button = (
+				<Button 
+					disabled={isApproving0 || isApproving1} 
+					onClick={onClickApprove} 
+					className="w-full h-12 mt-3 mb-3 text-lg rounded-lg shadow-glow">
+					{isApproving1 ? 
+					`批准代币 ${formattedPoolInfo.tokenInfo1.symbol} 中...` :
+					`批 准 代 币 ${formattedPoolInfo.tokenInfo1.symbol}`}
 				</Button>
 			)
 		}

@@ -8,6 +8,7 @@ export const usePools = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
 	const refetchPools = useCallback(async () => {
+		console.log("Refetching pools...");
 		setIsLoading(true);
 		try {
 			const formattedPoolInfos = await formatPoolInfos();
@@ -17,6 +18,7 @@ export const usePools = () => {
 		}
 		finally {
 			setIsLoading(false);
+			console.log("Finished refetching pools.");
 		}
 	}, []);
 
