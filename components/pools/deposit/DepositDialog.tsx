@@ -60,19 +60,25 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo }: DepositDialo
 
 	const onClickDeposit = async() => {
 		//to deposit logic
-		onClose();
-		await deposit({
-			token0: formattedPoolInfo.rawPoolInfo.token0,
-			token1: formattedPoolInfo.rawPoolInfo.token1,
-			index: formattedPoolInfo.rawPoolInfo.index,
-			amount0,
-			amount1,
-			decimals0: formattedPoolInfo.tokenInfo0.decimals,
-			decimals1: formattedPoolInfo.tokenInfo1.decimals,
-		});
-		setAmount0('');
-		setAmount1('');
-		toast.success('存入交易已提交，等待上链确认。');
+		try {
+			await deposit({
+				token0: formattedPoolInfo.rawPoolInfo.token0,
+				token1: formattedPoolInfo.rawPoolInfo.token1,
+				index: formattedPoolInfo.rawPoolInfo.index,
+				amount0,
+				amount1,
+				decimals0: formattedPoolInfo.tokenInfo0.decimals,
+				decimals1: formattedPoolInfo.tokenInfo1.decimals,
+			});
+
+			setAmount0('');
+			setAmount1('');
+			toast.success('存入交易已提交，等待上链确认。');
+		}
+		catch {
+			toast.error('存入失败，请重试。');
+			return;
+		}
 	}
 	
 
@@ -112,6 +118,13 @@ export const DepositDialog = ({ open, onClose, formattedPoolInfo }: DepositDialo
 					onClick={onClickApprove} 
 					className="w-full h-12 mt-3 mb-3 text-lg rounded-lg shadow-glow">
 					{isApproving0 ? '批准中...' : '批 准 '}
+				</Button>
+			)
+		}
+		else if (isDepositing) {
+			button = (
+				<Button disabled className="w-full h-12 mt-3 mb-3 bg-gray-200 text-gray-500 rounded-lg">
+					存入中...
 				</Button>
 			)
 		}
