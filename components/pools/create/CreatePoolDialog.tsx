@@ -1,12 +1,14 @@
 import { TokenInfo } from "@/app/tools/types";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
 import { Separator } from "../../ui/separator";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CreateFeeGroup } from "./CreateFeeGroup";
 import { CreateSelectToken } from "./CreateSelectToken";
 import { CreateInitialPrice } from "./CreateInitialPrice";
 import { toast } from "sonner";
 import { CreatePriceRange } from "./CreatePriceRange";
+import { getRange } from "@/app/pools/tools/poolMath";
+import { formatNumber } from "@/utils/format";
 
 interface CreatePoolDialogProps {
 	open: boolean;
@@ -19,6 +21,9 @@ export const CreatePoolDialog = ({ open, onClose }: CreatePoolDialogProps) => {
 	const [feeTier, setFeeTier] = useState<string>("500");
 	const [initialPrice, setInitialPrice] = useState<string>("");
 	const [rangeMode, setRangeMode] = useState<string>("full"); // "full" or "concentrated"
+	const debounceRef = useRef<NodeJS.Timeout | null>(null);
+	const [lower, setLower] = useState<string>("");
+	const [upper, setUpper] = useState<string>("");
 
 	const onSelectToken0 = (token: TokenInfo) => {
 		console.log("Selected token 0:", token);
@@ -55,6 +60,24 @@ export const CreatePoolDialog = ({ open, onClose }: CreatePoolDialogProps) => {
 		};
 	}, [open]);
 
+	useEffect(() => {
+		if (initialPrice === "" || isNaN(Number(initialPrice)) || Number(initialPrice) <= 0) {
+			return;
+		}
+
+		debounceRef.current = setTimeout(() => {
+			const range: number[] = getRange(initialPrice, feeTier);
+			setLower(formatNumber(range[0]));
+			setUpper(formatNumber(range[1]));
+		}, 500);
+
+		return () => {
+			if (debounceRef.current) {
+				clearTimeout(debounceRef.current);
+			}
+		}
+	}, [initialPrice, feeTier]);
+
 	return (
 		<Dialog open={open} onOpenChange={onClose}>
 			<DialogContent className="bg-card p-4 rounded-lg">
@@ -67,7 +90,7 @@ export const CreatePoolDialog = ({ open, onClose }: CreatePoolDialogProps) => {
 				<CreateSelectToken token0={token0} token1={token1} onSelectToken0={onSelectToken0} onSelectToken1={onSelectToken1} />
 				<CreateFeeGroup feeTier={feeTier} setFeeTier={setFeeTier} />
 				<CreateInitialPrice token0={token0} token1={token1} initialPrice={initialPrice} onInitialPriceChange={setInitialPrice} />
-				<CreatePriceRange token0={token0} token1={token1} rangeMode={rangeMode} setRangeMode={setRangeMode} />
+				<CreatePriceRange token0={token0} token1={token1} rangeMode={rangeMode} setRangeMode={setRangeMode} lower={lower} upper={upper} onSetLower={setLower} onSetUpper={setUpper} />
 			</DialogContent>
 		</Dialog>
 	);

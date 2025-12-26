@@ -16,3 +16,13 @@ export function formatBigIntAmount(amountBigInt: bigint, decimals: number = 18, 
 	});
 	return format.format(Number(formatUnits(amountBigInt, decimals)));
 }
+
+
+export function formatNumber(amount: number, precision: number = 6): string {
+	const format: Intl.NumberFormat = new Intl.NumberFormat('en-US', {
+		minimumFractionDigits: 0,
+		maximumFractionDigits: precision,
+		useGrouping: true,
+	});
+	return format.format(amount);
+}

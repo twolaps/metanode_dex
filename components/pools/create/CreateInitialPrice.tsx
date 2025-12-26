@@ -2,6 +2,7 @@ import { TokenInfo } from "@/app/tools/types"
 import { Input } from "@/components/ui/input";
 import { JSX } from "react";
 import { NoTokensPlaceholder } from "./NoTokensPlaceholder";
+import { Separator } from "@/components/ui/separator";
 
 interface CreateInitialPriceProps {
 	token0: TokenInfo | null;
@@ -46,6 +47,7 @@ export const CreateInitialPrice = ({ token0, token1, initialPrice, onInitialPric
 		<div>
 			<h1 className="mb-2">初始价格设置</h1>
 			{initialPriceJE}
+			<Separator className="mt-4" />
 		</div>
 	)
 }

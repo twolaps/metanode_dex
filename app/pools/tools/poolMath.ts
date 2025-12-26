@@ -225,3 +225,25 @@ export const calculateAmountsFrom1 = (
 
   return [calcAmount0, calcAmount1, ""];
 };
+
+export const getRange = (initialPrice: string, feeTier: string): [number, number] => {
+	let lower: number;
+	let upper: number;
+	if (feeTier == "500") {
+		lower = Number(initialPrice) * 0.995;
+		upper = Number(initialPrice) * 1.005;
+	}
+	else if (feeTier == "3000") {
+		lower = Number(initialPrice) * 0.8;
+		upper = Number(initialPrice) * 1.2;
+	}
+	else if (feeTier == "10000") {
+		lower = Number(initialPrice) * 0.5;
+		upper = Number(initialPrice) * 2;
+	}
+	else {
+		lower = Number(initialPrice) * 0.9;
+		upper = Number(initialPrice) * 1.1;
+	}
+	return [lower, upper];
+};
