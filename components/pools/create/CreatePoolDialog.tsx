@@ -35,7 +35,8 @@ export const CreatePoolDialog = ({ open, onClose, refetchPools }: CreatePoolDial
 		isConfirming,
 		isConfirmSuccess,
 		isError,
-		hash
+		hash,
+		resetCreate
 	} = useCreatePool();
 
 	const onSelectToken0 = (token: TokenInfo) => {
@@ -108,10 +109,12 @@ export const CreatePoolDialog = ({ open, onClose, refetchPools }: CreatePoolDial
 
 	useEffect(() => {
 		if (isConfirmSuccess) {
+			toast.success("池子创建成功！");
+			resetCreate();
 			refetchPools();
 			onClose();
 		}
-	}, [isConfirmSuccess, refetchPools, onClose]);
+	}, [isConfirmSuccess, refetchPools, onClose, resetCreate]);
 
 	const getAvailable = (): boolean => {
 		if (!token0 || !token1) {

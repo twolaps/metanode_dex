@@ -7,7 +7,7 @@ import { useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 
 export const useCreatePool = () => {
 
-	const {writeContract, data: hash, isPending: isWritePending, isSuccess: isWriteSuccess, isError} = useWriteContract();
+	const {writeContract, data: hash, isPending: isWritePending, isSuccess: isWriteSuccess, isError, reset: resetCreate} = useWriteContract();
 	const {isLoading: isConfirming, isSuccess: isConfirmSuccess} = useWaitForTransactionReceipt({
 		hash,
 		confirmations: 2,
@@ -106,5 +106,6 @@ export const useCreatePool = () => {
 			isConfirmSuccess,
 			isError,
 			hash,
+			resetCreate,
 		}
 }
