@@ -1,7 +1,7 @@
 import { encodePriceToSqrtX96, priceToTick } from "@/app/pools/tools/poolMath"
 import { TokenInfo } from "@/app/tools/types"
 import { poolManagerConfig } from "@/config/contracts"
-import { TICK_SPACINGS, TickMath } from "@uniswap/v3-sdk"
+import { nearestUsableTick, TICK_SPACINGS, TickMath } from "@uniswap/v3-sdk"
 import { toast } from "sonner"
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 
@@ -62,8 +62,8 @@ export const useCreatePool = () => {
 		}
 
 		if (param.rangeMode === "full") {
-			tickLower = TickMath.MIN_TICK;
-			tickUpper = TickMath.MAX_TICK;
+			tickLower = nearestUsableTick(TickMath.MIN_TICK, spacing);
+			tickUpper = nearestUsableTick(TickMath.MAX_TICK, spacing);
 		} else {
 			// 1. 确保输入的价格数值本身是正确的顺序
 			const [lowPrice, highPrice] = Number(param.lower) <= Number(param.upper)? [param.lower, param.upper]:[param.upper, param.lower];
@@ -78,6 +78,9 @@ export const useCreatePool = () => {
 		}
 
 		try {
+			console.log("Creating pool with params:");
+			console.log(tickLower, tickUpper, sqrtPriceX96);
+
 			writeContract({
 				...poolManagerConfig,
 				functionName: 'createAndInitializePoolIfNecessary',

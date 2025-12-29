@@ -2,7 +2,7 @@ import { FormattedPoolInfo, RawPoolInfo, TokenInfo } from "@/app/tools/types";
 import { client } from "@/config/client";
 import { poolManagerConfig } from "@/config/contracts";
 import { Token } from "@uniswap/sdk-core";
-import { TICK_SPACINGS, Pool, Position, encodeSqrtRatioX96, TickMath } from "@uniswap/v3-sdk";
+import { TICK_SPACINGS, Pool, Position, encodeSqrtRatioX96, TickMath, nearestUsableTick } from "@uniswap/v3-sdk";
 import JSBI from "jsbi";
 import { Address, erc20Abi, isAddress, maxUint256 } from "viem";
 
@@ -16,7 +16,7 @@ export async function formatPoolInfos(): Promise<FormattedPoolInfo[]> {
 		});
 		rawPools = result as RawPoolInfo[];
 
-		// console.log("poolData:", stringify(rawPools));
+		console.log("poolData:", rawPools);
 	}
 	catch (error) {
 		console.error("Error fetching pools:", error);
@@ -96,8 +96,11 @@ export async function formatPoolInfos(): Promise<FormattedPoolInfo[]> {
 
 		const decimalAdjustment: number = 10 ** (decimals0 - decimals1);
 
+		const spacing: number = TICK_SPACINGS[rawPool.fee as keyof typeof TICK_SPACINGS];
 		let range: string = '1';
-		if (rawPool.tickLower === -887220 && rawPool.tickUpper === 887220) {
+		const minTick: number = nearestUsableTick(TickMath.MIN_TICK, spacing);
+		const maxTick: number = nearestUsableTick(TickMath.MAX_TICK, spacing);
+		if (rawPool.tickLower === minTick && rawPool.tickUpper === maxTick) {
 			range = 'Full Range';
 		}
 		else if (rawPool.tickLower < rawPool.tickUpper) {
