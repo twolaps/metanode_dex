@@ -25,6 +25,9 @@ export const HeaderView = () => {
 		} else if (value === "tab2") {
 			router.push("/pools");
 		}
+		else if(value === "tab3") {
+			router.push("/positions");
+		}
 	}
 
 	const tabTriggerClass: string = [
@@ -42,7 +45,7 @@ export const HeaderView = () => {
 					<TabsList className="w-100 h-12 gap-5 p-1 bg-transparent">
 						<TabsTrigger value="tab1" className={tabTriggerClass}>Swap</TabsTrigger>
 						<TabsTrigger value="tab2" className={tabTriggerClass}>Pools</TabsTrigger>
-						<TabsTrigger value="tab3" className={tabTriggerClass}>Position</TabsTrigger>
+						<TabsTrigger value="tab3" className={tabTriggerClass}>Positions</TabsTrigger>
 					</TabsList>
 				</Tabs>
 			</div>

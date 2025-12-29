@@ -15,6 +15,7 @@ import { SettingButton } from "./SettingButton";
 import { SlippageSetting } from "./SlippageSetting";
 import { cn } from "@/lib/utils";
 import { swapConfig } from "@/config/contracts";
+import { titleClass } from "@/config/styles";
 
 /**
  * 核心组件：SwapView
@@ -60,13 +61,6 @@ export default function SwapView() {
 	const [showSettings, setShowSettings] = useState<boolean>(false);
 	const [slippage, setSlippage] = useState('0.5');
 
-
-	// --- 样式定义 (Tailwind CSS) ---
-	const titleClass: string = cn(
-		'w-fit', 'text-5xl', 'font-bold',
-		'bg-gradient-to-r', 'from-[#6E63F2]', 'to-[#F166BB]', 'bg-clip-text', 'text-transparent',
-		'text-[36px]',
-	);
 
 	const descriptionClass: string = cn(
 		'w-fit', 'text-base', 'mt-2', 'text-[#99A1AF]',

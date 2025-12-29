@@ -7,12 +7,12 @@
 
 	/* --- 字体配置 --- */
   /* 直接填入您的字体列表，确保 v4 能生成正确的类名 */
-  --font-sans: "Inter", system-ui, "-apple-system", "BlinkMacSystemFont", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  --font-mono: "Consolas", "Monaco", "monospace";
+  --font-sans: "Inter" system-ui "-apple-system" "BlinkMacSystemFont" "PingFang SC" "Hiragino Sans GB" "Microsoft YaHei" sans-serif;
+  --font-mono: "Consolas" "Monaco" "monospace";
 
   /* --- 阴影与颜色扩展 (解决失效问题) --- */
   /* 定义您的紫色发光变量，对应 shadow-glow 类名 */
-  --shadow-glow: 0 0 25px rgba(110, 99, 242, 1);
+  --shadow-glow: 0 0 25px rgba(110 99 242 1);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -134,8 +134,8 @@
 }
 
 @layer utilities {
-  /* 隐藏 Chrome, Safari, Edge, Opera 的上下小箭头 */
-  input[type="number"]::-webkit-outer-spin-button,
+  /* 隐藏 Chrome Safari Edge Opera 的上下小箭头 */
+  input[type="number"]::-webkit-outer-spin-button
   input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
@@ -146,4 +146,6 @@
     -moz-appearance: textfield;
   }
 }
+
+
 
