@@ -1,5 +1,5 @@
 import { TokenInfo } from "@/app/tools/types"
-import { JSX, use, useEffect, useMemo, useState } from "react";
+import { JSX, useMemo } from "react";
 import { NoTokensPlaceholder } from "./NoTokensPlaceholder";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";

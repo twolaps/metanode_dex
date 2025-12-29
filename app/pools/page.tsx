@@ -26,11 +26,11 @@ export default function PoolsPage() {
 	return (
 		<div className="flex flex-col items-center">
 			<div className="w-[1200px] flex items-end">
-				<Button className="mt-4 mb-4 ml-auto mr-0 shadow-glow" onClick={onClickAddLiquidity}>创建/添加流动性</Button>
+				<Button className="mt-4 mb-4 ml-auto mr-0 shadow-glow" onClick={onClickAddLiquidity}>创建池子</Button>
 			</div>
 
 			<FormattedPoolsTable pools={pools} onClickDeposit={onClickDeposit} />
-			<CreatePoolDialog open={isCreateDialogOpen} onClose={() => setIsCreateDialogOpen(false)} />
+			<CreatePoolDialog open={isCreateDialogOpen} onClose={() => setIsCreateDialogOpen(false)} refetchPools={refetchPools}/>
 			<DepositDialog open={isDepositDialogOpen} onClose={() => setIsDepositDialogOpen(false)} formattedPoolInfo={targetPool!} refetchPools={refetchPools} />
 		</div>
 	);

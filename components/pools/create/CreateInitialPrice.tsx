@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { JSX } from "react";
 import { NoTokensPlaceholder } from "./NoTokensPlaceholder";
 import { Separator } from "@/components/ui/separator";
+import { sortTokens } from "@/app/pools/tools/poolMath";
 
 interface CreateInitialPriceProps {
 	token0: TokenInfo | null;
@@ -15,9 +16,6 @@ export const CreateInitialPrice = ({ token0, token1, initialPrice, onInitialPric
 	console.log("CreateInitialPrice token0:", token0, "token1:", token1);
 	let pair: TokenInfo[] = [];
 	
-	const sortTokens = (a: TokenInfo, b: TokenInfo): TokenInfo[] => {
-		return a.address.toLowerCase() < b.address.toLowerCase() ? [a, b] : [b, a];
-	}
 
 	if (token0 && token1) {
 		pair = sortTokens(token0, token1);

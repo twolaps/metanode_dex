@@ -2,7 +2,7 @@ import { FormattedPoolInfo, RawPoolInfo, TokenInfo } from "@/app/tools/types";
 import { client } from "@/config/client";
 import { poolManagerConfig } from "@/config/contracts";
 import { Token } from "@uniswap/sdk-core";
-import { TICK_SPACINGS, Pool, Position } from "@uniswap/v3-sdk";
+import { TICK_SPACINGS, Pool, Position, encodeSqrtRatioX96, TickMath } from "@uniswap/v3-sdk";
 import JSBI from "jsbi";
 import { Address, erc20Abi, isAddress, maxUint256 } from "viem";
 
@@ -247,3 +247,62 @@ export const getRange = (initialPrice: string, feeTier: string): [number, number
 	}
 	return [lower, upper];
 };
+
+
+/**
+ * 将 initialPrice 转换为 sqrtPriceX96
+ * @param price 用户输入的初始价格 (number 或 string)
+ * @param token0Decimals token0 的精度
+ * @param token1Decimals token1 的精度
+ */
+export function encodePriceToSqrtX96(
+	price: string, token0Decimals: number, token1Decimals: number): bigint {
+
+  // 2. 为了保留精度，我们将价格放大一个很大的倍数（比如 10^10）
+  // 这样可以将小数价格转为整数处理
+  const scalar = 10 ** 10;
+  const priceScaled = BigInt(Math.floor(parseFloat(price) * scalar));
+
+  // 3. 计算 raw amounts
+  // 公式逻辑：amount1 / amount0 = price * (10^d1 / 10^d0)
+  // 代入放大倍数：amount1 / amount0 = (priceScaled / scalar) * (10^d1 / 10^d0)
+  // 整理得：amount1 = priceScaled * 10^d1, amount0 = scalar * 10^d0
+  
+  const amount1 = priceScaled * (10n ** BigInt(token1Decimals));
+  const amount0 = BigInt(scalar) * (10n ** BigInt(token0Decimals));
+
+  // 4. 使用 SDK 转换（SDK 内部会处理平方根和 Q64.96 逻辑）
+  const sqrtPriceX96 = encodeSqrtRatioX96(amount1.toString(), amount0.toString());
+  
+  return BigInt(sqrtPriceX96.toString());
+}
+
+/**
+ * 将价格转换为 Tick
+ * @param price 价格字符串 (Token1 / Token0)
+ * @param t0Decimals Token0 精度
+ * @param t1Decimals Token1 精度
+ * @param tickSpacing 费率对应的间隔 (如 0.3% 对应 60)
+ */
+export function priceToTick(
+  price: string, 
+  t0Decimals: number, 
+  t1Decimals: number, 
+  tickSpacing: number
+): number {
+  // 1. 先利用你现有的逻辑算出 sqrtPriceX96
+  // (或者直接在这里复用 encodePriceToSqrtX96 的逻辑)
+  const sqrtX96 = encodePriceToSqrtX96(price, t0Decimals, t1Decimals);
+
+  // 2. 使用 SDK 将 sqrtPriceX96 转换为原始 Tick
+  // 注意：需要转为 JSBI 类型供 SDK 使用
+  const tick = TickMath.getTickAtSqrtRatio(JSBI.BigInt(sqrtX96.toString()));
+
+  // 3. 重要：必须“对齐”到 tickSpacing，否则合约会报错
+  // tickLower 应该向下取整到 spacing 的倍数
+  return Math.floor(tick / tickSpacing) * tickSpacing;
+}
+
+export const sortTokens = (a: TokenInfo, b: TokenInfo): TokenInfo[] => {
+		return a.address.toLowerCase() < b.address.toLowerCase() ? [a, b] : [b, a];
+	}
