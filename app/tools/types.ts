@@ -97,3 +97,19 @@ export const SUPPORTED_TOKENS: TokenInfo[] = [
     decimals: 18, // 
   }
 ];
+
+export interface RawPositionInfo {
+	fee: number;
+	feeGrowthInside0LastX128: bigint;
+	feeGrowthInside1LastX128: bigint;
+	id: bigint;
+	index: number;
+	liquidity: bigint;
+	owner: Address;
+	tickLower: number;
+	tickUpper: number;
+	token0: Address;
+	token1: Address;
+	tokensOwed0: bigint;
+	tokensOwed1: bigint;
+}
