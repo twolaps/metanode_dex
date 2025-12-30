@@ -6,13 +6,17 @@ import { usePositions } from "@/hooks/usePositions";
 
 export default function PositionsPage() {
 
-	const {allPositions, myPositions, isLoading, refetchPositions} = usePositions();
+	const {myPositions, isLoading, refetchPositionPools} = usePositions();
 
 	return (
 		<div className="flex flex-col items-center w-full mt-5">
 			<h1 className={titleClass}>Positions</h1>
 			<PositionOverview />
-			<PositionsList myPositions={myPositions} />
+			{isLoading ? (
+				<p className="mt-10 text-lg">数据加载中...</p>
+			) : (
+				<PositionsList myPositions={myPositions} refetch={refetchPositionPools} />
+			)}
 		</div>
 	);
 }

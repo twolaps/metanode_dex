@@ -7,7 +7,6 @@ import { CreatePoolDialog } from "@/components/pools/create/CreatePoolDialog";
 import { DepositDialog } from "@/components/pools/deposit/DepositDialog";
 import { usePools } from "@/hooks/usePools";
 import { titleClass } from "@/config/styles";
-import { cn } from "@/lib/utils";
 
 export default function PoolsPage() {
 	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState<boolean>(false);

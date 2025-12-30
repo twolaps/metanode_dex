@@ -1,4 +1,4 @@
-import { FormattedPoolInfo, RawPoolInfo, TokenInfo } from "@/app/tools/types";
+import { FormattedPoolInfo, RawPoolInfo, RawPositionInfo, TokenInfo } from "@/app/tools/types";
 import { client } from "@/config/client";
 import { poolManagerConfig } from "@/config/contracts";
 import { Token } from "@uniswap/sdk-core";
@@ -307,5 +307,46 @@ export function priceToTick(
 }
 
 export const sortTokens = (a: TokenInfo, b: TokenInfo): TokenInfo[] => {
-		return a.address.toLowerCase() < b.address.toLowerCase() ? [a, b] : [b, a];
-	}
+	return a.address.toLowerCase() < b.address.toLowerCase() ? [a, b] : [b, a];
+}
+
+/**
+ * 计算仓位当前的资产构成 (Token0 和 Token1 的数量)
+ */
+export function getPositionAmounts(
+  position: RawPositionInfo, 
+  poolInfo: FormattedPoolInfo, 
+  chainId: number = 1 // 根据您的链ID调整，或者从配置读取
+) {
+  // 1. 构建 Token 实例
+  const token0 = new Token(chainId, poolInfo.tokenInfo0.address, poolInfo.tokenInfo0.decimals, poolInfo.tokenInfo0.symbol);
+  const token1 = new Token(chainId, poolInfo.tokenInfo1.address, poolInfo.tokenInfo1.decimals, poolInfo.tokenInfo1.symbol);
+
+  // 2. 构建 Pool 实例 (SDK 需要知道当前池子的状态)
+  const pool = new Pool(
+    token0,
+    token1,
+    poolInfo.rawPoolInfo.fee,
+    poolInfo.rawPoolInfo.sqrtPriceX96.toString(),
+    poolInfo.rawPoolInfo.liquidity.toString(),
+    poolInfo.rawPoolInfo.tick
+  );
+
+  // 3. 构建 Position 实例
+  // 这一步最关键：SDK 会根据 liquidity + currentTick 自动算出 amount0 和 amount1
+  const sdkPosition = new Position({
+    pool,
+    liquidity: position.liquidity.toString(),
+    tickLower: position.tickLower,
+    tickUpper: position.tickUpper,
+  });
+
+  // 4. 获取结果 (返回的是字符串形式的可读数字，或者您需要的 BigInt)
+  return {
+    amount0: sdkPosition.amount0, // CurrencyAmount 对象
+    amount1: sdkPosition.amount1, // CurrencyAmount 对象
+    // 如果您直接想要格式化好的字符串：
+    amount0Str: sdkPosition.amount0.toSignificant(6),
+    amount1Str: sdkPosition.amount1.toSignificant(6),
+  };
+}
