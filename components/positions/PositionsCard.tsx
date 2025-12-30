@@ -6,7 +6,7 @@ import { useAccount, useChainId } from "wagmi";
 import { JSX, useEffect } from "react";
 import { Button } from "../ui/button";
 import { useCollect } from "@/hooks/useCollect";
-import { isAddress } from "viem";
+import { formatUnits, isAddress } from "viem";
 import { useBurn } from "@/hooks/useBurn";
 
 interface PositionsCardProps {
@@ -51,11 +51,11 @@ export const PositionsCard = ({ position, refetch }: PositionsCardProps) => {
 
 	const oweJSX: JSX.Element[] = [];
 	if (position.token0.toLowerCase() === position.poolInfo.tokenInfo0.address.toLowerCase()) {
-		oweJSX.push(<div key="owed0">{position.tokensOwed0} {position.poolInfo.tokenInfo0.symbol}</div>);
-		oweJSX.push(<div key="owed1">{position.tokensOwed1} {position.poolInfo.tokenInfo1.symbol}</div>);
+		oweJSX.push(<div key="owed0">{formatUnits(position.tokensOwed0, position.poolInfo.tokenInfo0.decimals)} {position.poolInfo.tokenInfo0.symbol}</div>);
+		oweJSX.push(<div key="owed1">{formatUnits(position.tokensOwed1, position.poolInfo.tokenInfo1.decimals)} {position.poolInfo.tokenInfo1.symbol}</div>);
 	} else {
-		oweJSX.push(<div key="owed1">{position.tokensOwed1} {position.poolInfo.tokenInfo0.symbol}</div>);
-		oweJSX.push(<div key="owed0">{position.tokensOwed0} {position.poolInfo.tokenInfo1.symbol}</div>);
+		oweJSX.push(<div key="owed1">{formatUnits(position.tokensOwed1, position.poolInfo.tokenInfo0.decimals)} {position.poolInfo.tokenInfo0.symbol}</div>);
+		oweJSX.push(<div key="owed0">{formatUnits(position.tokensOwed0, position.poolInfo.tokenInfo1.decimals)} {position.poolInfo.tokenInfo1.symbol}</div>);
 	}
 
 	return (
@@ -67,7 +67,7 @@ export const PositionsCard = ({ position, refetch }: PositionsCardProps) => {
 			</div>
 			<Separator className="my-3" />
 
-			<div className="ml-5 flex items-start gap-30 mb-5">
+			<div className="ml-5 flex items-start gap-32 mb-5">
 				<div className="flex flex-col justify-center items-center">
 					<div>价格区间</div>
 					<div>{position.poolInfo.range}</div>
